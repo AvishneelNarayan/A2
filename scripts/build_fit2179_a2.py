@@ -629,7 +629,7 @@ def write_specs():
         "data": {"url": "data/processed/hourly_service.csv"},
         "mark": {"type": "rect"},
         "encoding": {
-            "x": {"field": "hour", "type": "ordinal", "title": "Hour of day"},
+            "x": {"field": "hour", "type": "ordinal", "sort": list(range(24)), "title": "Hour of day"},
             "y": {"field": "mode", "type": "nominal", "title": None},
             "color": {"field": "departures", "type": "quantitative", "scale": {"scheme": "blues"}, "title": "Departures"},
             "tooltip": [{"field": "mode"}, {"field": "hour"}, {"field": "departures", "format": ","}],
