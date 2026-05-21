@@ -535,7 +535,7 @@ def write_specs():
         "data": {"url": "data/processed/melbourne_stops.csv"},
         "facet": {"field": "mode", "type": "nominal", "columns": 2, "title": None},
         "spec": {
-            "width": 420,
+            "width": 360,
             "height": 260,
             "projection": {"type": "mercator"},
             "layer": [
@@ -651,7 +651,7 @@ def write_site():
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20260522b">
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -844,7 +844,7 @@ h2 {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
-  overflow-x: auto;
+  overflow: hidden;
   box-shadow: 0 10px 28px rgba(24, 39, 46, 0.06);
 }
 
@@ -854,6 +854,11 @@ h2 {
 
 .vega-embed {
   width: 100%;
+}
+
+.vega-embed > svg {
+  max-width: 100%;
+  height: auto;
 }
 
 footer {

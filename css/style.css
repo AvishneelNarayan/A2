@@ -119,7 +119,7 @@ h2 {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
-  overflow-x: auto;
+  overflow: hidden;
   box-shadow: 0 10px 28px rgba(24, 39, 46, 0.06);
 }
 
@@ -129,6 +129,11 @@ h2 {
 
 .vega-embed {
   width: 100%;
+}
+
+.vega-embed > svg {
+  max-width: 100%;
+  height: auto;
 }
 
 footer {

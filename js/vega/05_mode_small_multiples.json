@@ -29,9 +29,9 @@
     "columns": 2,
     "title": null
   },
-  "spec": {
-    "width": 420,
-    "height": 260,
+        "spec": {
+            "width": 360,
+            "height": 260,
     "projection": {
       "type": "mercator"
     },
