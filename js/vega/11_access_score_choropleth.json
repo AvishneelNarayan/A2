@@ -26,7 +26,11 @@
     "type": "mercator"
   },
   "data": {
-    "url": "data/processed/melbourne_sa2.geojson"
+    "url": "../../data/processed/melbourne_sa2.geojson",
+    "format": {
+      "type": "json",
+      "property": "features"
+    }
   },
   "mark": {
     "type": "geoshape",
@@ -35,7 +39,7 @@
   },
   "encoding": {
     "color": {
-      "field": "access_score",
+      "field": "properties.access_score",
       "type": "quantitative",
       "scale": {
         "scheme": "viridis",
@@ -48,16 +52,16 @@
     },
     "tooltip": [
       {
-        "field": "SA2_NAME21",
+        "field": "properties.SA2_NAME21",
         "title": "SA2"
       },
       {
-        "field": "total_stops",
+        "field": "properties.total_stops",
         "title": "Total stops",
         "format": ","
       },
       {
-        "field": "access_score",
+        "field": "properties.access_score",
         "title": "Overall Public Transport Access Score",
         "format": ".2f"
       }

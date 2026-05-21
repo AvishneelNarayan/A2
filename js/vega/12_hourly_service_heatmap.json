@@ -23,7 +23,7 @@
   "width": "container",
   "height": 240,
   "data": {
-    "url": "data/processed/hourly_service.csv"
+    "url": "../../data/processed/hourly_service.csv"
   },
   "mark": {
     "type": "rect"

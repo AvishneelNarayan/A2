@@ -26,7 +26,11 @@
     "type": "mercator"
   },
   "data": {
-    "url": "data/processed/melbourne_sa2.geojson"
+    "url": "../../data/processed/melbourne_sa2.geojson",
+    "format": {
+      "type": "json",
+      "property": "features"
+    }
   },
   "mark": {
     "type": "geoshape",
@@ -35,7 +39,7 @@
   },
   "encoding": {
     "color": {
-      "field": "stops_per_sqkm",
+      "field": "properties.stops_per_sqkm",
       "type": "quantitative",
       "scale": {
         "scheme": "tealblues"
@@ -44,16 +48,16 @@
     },
     "tooltip": [
       {
-        "field": "SA2_NAME21",
+        "field": "properties.SA2_NAME21",
         "title": "SA2"
       },
       {
-        "field": "total_stops",
+        "field": "properties.total_stops",
         "title": "Total stops",
         "format": ","
       },
       {
-        "field": "stops_per_sqkm",
+        "field": "properties.stops_per_sqkm",
         "title": "Stops per Square Kilometre",
         "format": ".2f"
       }

@@ -23,7 +23,7 @@
   "width": "container",
   "height": 310,
   "data": {
-    "url": "data/processed/mode_counts.csv"
+    "url": "../../data/processed/mode_counts.csv"
   },
   "mark": {
     "type": "bar",

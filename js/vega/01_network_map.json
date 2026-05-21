@@ -28,7 +28,11 @@
   "layer": [
     {
       "data": {
-        "url": "data/processed/melbourne_sa2.geojson"
+        "url": "../../data/processed/melbourne_sa2.geojson",
+        "format": {
+          "type": "json",
+          "property": "features"
+        }
       },
       "mark": {
         "type": "geoshape",
@@ -39,7 +43,11 @@
     },
     {
       "data": {
-        "url": "data/processed/melbourne_lines.geojson"
+        "url": "../../data/processed/melbourne_lines.geojson",
+        "format": {
+          "type": "json",
+          "property": "features"
+        }
       },
       "mark": {
         "type": "geoshape",
@@ -48,7 +56,7 @@
       },
       "encoding": {
         "color": {
-          "field": "mode",
+          "field": "properties.mode",
           "type": "nominal",
           "scale": {
             "domain": [
@@ -68,11 +76,11 @@
         },
         "tooltip": [
           {
-            "field": "route",
+            "field": "properties.route",
             "title": "Route"
           },
           {
-            "field": "mode",
+            "field": "properties.mode",
             "title": "Mode"
           }
         ]
