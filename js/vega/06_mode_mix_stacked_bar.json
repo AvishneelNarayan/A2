@@ -1,0 +1,117 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Mode Mix in the Largest Stop Areas",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 390,
+  "data": {
+    "url": "data/processed/sa2_access_summary.csv"
+  },
+  "transform": [
+    {
+      "window": [
+        {
+          "op": "rank",
+          "as": "rank"
+        }
+      ],
+      "sort": [
+        {
+          "field": "total_stops",
+          "order": "descending"
+        }
+      ]
+    },
+    {
+      "filter": "datum.rank <= 15"
+    },
+    {
+      "fold": [
+        "train_stops",
+        "tram_stops",
+        "bus_stops",
+        "regional_stops"
+      ],
+      "as": [
+        "mode_type",
+        "stops"
+      ]
+    },
+    {
+      "calculate": "replace(replace(replace(replace(datum.mode_type, '_stops', ''), 'train', 'Train'), 'tram', 'Tram'), 'bus', 'Bus')",
+      "as": "mode_label"
+    },
+    {
+      "calculate": "datum.mode_label == 'regional' ? 'Regional' : datum.mode_label",
+      "as": "mode_label"
+    }
+  ],
+  "mark": {
+    "type": "bar"
+  },
+  "encoding": {
+    "x": {
+      "field": "SA2_NAME21",
+      "type": "nominal",
+      "sort": "-y",
+      "axis": {
+        "labelAngle": -35
+      },
+      "title": null
+    },
+    "y": {
+      "field": "stops",
+      "type": "quantitative",
+      "title": "Stops"
+    },
+    "color": {
+      "field": "mode_label",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "Train",
+          "Tram",
+          "Bus",
+          "Regional"
+        ],
+        "range": [
+          "#2364aa",
+          "#2a9d8f",
+          "#e76f51",
+          "#7b2cbf"
+        ]
+      },
+      "title": "Mode"
+    },
+    "tooltip": [
+      {
+        "field": "SA2_NAME21"
+      },
+      {
+        "field": "mode_label",
+        "title": "Mode"
+      },
+      {
+        "field": "stops"
+      }
+    ]
+  }
+}

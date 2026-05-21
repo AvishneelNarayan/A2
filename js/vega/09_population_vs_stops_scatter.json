@@ -1,0 +1,75 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Population and Stop Supply Do Not Always Move Together",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 390,
+  "data": {
+    "url": "data/processed/sa2_access_summary.csv"
+  },
+  "mark": {
+    "type": "circle",
+    "opacity": 0.68,
+    "size": 70
+  },
+  "encoding": {
+    "x": {
+      "field": "population",
+      "type": "quantitative",
+      "title": "Population, 2025",
+      "scale": {
+        "type": "sqrt"
+      }
+    },
+    "y": {
+      "field": "total_stops",
+      "type": "quantitative",
+      "title": "Total stops",
+      "scale": {
+        "type": "sqrt"
+      }
+    },
+    "color": {
+      "field": "access_score",
+      "type": "quantitative",
+      "scale": {
+        "scheme": "viridis"
+      },
+      "title": "Access score"
+    },
+    "tooltip": [
+      {
+        "field": "SA2_NAME21",
+        "title": "SA2"
+      },
+      {
+        "field": "population",
+        "format": ","
+      },
+      {
+        "field": "total_stops"
+      },
+      {
+        "field": "access_score"
+      }
+    ]
+  }
+}

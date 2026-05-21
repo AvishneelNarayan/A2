@@ -1,0 +1,979 @@
+import csv
+import json
+import math
+import os
+import shutil
+import struct
+from collections import Counter, defaultdict
+from pathlib import Path
+
+import openpyxl
+
+
+ROOT = Path(r"C:\Users\hp\Desktop\Uni 2026A\FIT2179")
+SOURCE = ROOT / "a2 data"
+PROJECT = ROOT / "A2"
+RAW = PROJECT / "data" / "raw"
+PROCESSED = PROJECT / "data" / "processed"
+VEGA = PROJECT / "js" / "vega"
+
+STOP_MODES = {
+    "METRO TRAIN": "Train",
+    "REGIONAL TRAIN": "Train",
+    "INTERSTATE TRAIN": "Train",
+    "METRO TRAM": "Tram",
+    "METRO BUS": "Bus",
+    "REGIONAL BUS": "Regional",
+    "REGIONAL COACH": "Regional",
+    "SKYBUS": "Bus",
+}
+
+PALETTE = {
+    "Train": "#2364aa",
+    "Tram": "#2a9d8f",
+    "Bus": "#e76f51",
+    "Regional": "#7b2cbf",
+}
+
+
+def ensure_dirs():
+    for path in [
+        PROJECT,
+        PROJECT / "css",
+        PROJECT / "js",
+        VEGA,
+        RAW,
+        PROCESSED,
+        PROJECT / "assets",
+        PROJECT / "sketch",
+        PROJECT / "scripts",
+    ]:
+        path.mkdir(parents=True, exist_ok=True)
+
+
+def dbf_records(path):
+    with path.open("rb") as f:
+        header = f.read(32)
+        n_records = struct.unpack("<I", header[4:8])[0]
+        header_len = struct.unpack("<H", header[8:10])[0]
+        record_len = struct.unpack("<H", header[10:12])[0]
+        fields = []
+        while True:
+            b = f.read(32)
+            if b[0] == 13:
+                break
+            name = b[:11].split(b"\0", 1)[0].decode("ascii", "ignore")
+            fields.append((name, chr(b[11]), b[16]))
+        f.seek(header_len)
+        for _ in range(n_records):
+            rec = f.read(record_len)
+            if not rec or rec[0:1] == b"*":
+                continue
+            pos = 1
+            row = {}
+            for name, typ, length in fields:
+                raw = rec[pos : pos + length].decode("latin1", "ignore").strip()
+                row[name] = raw
+                pos += length
+            yield row
+
+
+def shp_polygons(path, attrs):
+    with path.open("rb") as f:
+        f.seek(100)
+        idx = 0
+        while True:
+            rec_header = f.read(8)
+            if len(rec_header) < 8:
+                break
+            _, content_len_words = struct.unpack(">2i", rec_header)
+            content = f.read(content_len_words * 2)
+            shape_type = struct.unpack("<i", content[:4])[0]
+            attr = attrs[idx]
+            idx += 1
+            if shape_type == 0:
+                continue
+            if shape_type not in (5, 15, 25, 31):
+                continue
+            xmin, ymin, xmax, ymax = struct.unpack("<4d", content[4:36])
+            num_parts, num_points = struct.unpack("<2i", content[36:44])
+            offset = 44
+            parts = list(struct.unpack(f"<{num_parts}i", content[offset : offset + 4 * num_parts]))
+            offset += 4 * num_parts
+            pts = [
+                struct.unpack("<2d", content[offset + i * 16 : offset + i * 16 + 16])
+                for i in range(num_points)
+            ]
+            rings = []
+            for part_idx, start in enumerate(parts):
+                end = parts[part_idx + 1] if part_idx + 1 < len(parts) else num_points
+                ring = pts[start:end]
+                if len(ring) >= 4:
+                    rings.append(ring)
+            yield attr, (xmin, ymin, xmax, ymax), rings
+
+
+def point_in_ring(x, y, ring):
+    inside = False
+    j = len(ring) - 1
+    for i, (xi, yi) in enumerate(ring):
+        xj, yj = ring[j]
+        if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / ((yj - yi) or 1e-12) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+
+def simplify_ring(ring, stride):
+    if len(ring) <= 12:
+        return [[round(x, 5), round(y, 5)] for x, y in ring]
+    pts = ring[::stride]
+    if pts[0] != pts[-1]:
+        pts.append(pts[0])
+    return [[round(x, 5), round(y, 5)] for x, y in pts]
+
+
+def load_sa2():
+    shp_dir = SOURCE / "SA2_2021_AUST_SHP_GDA2020"
+    attrs = list(dbf_records(shp_dir / "SA2_2021_AUST_GDA2020.dbf"))
+    polygons = []
+    for attr, bbox, rings in shp_polygons(shp_dir / "SA2_2021_AUST_GDA2020.shp", attrs):
+        if attr.get("GCC_NAME21") != "Greater Melbourne":
+            continue
+        polygons.append({"attr": attr, "bbox": bbox, "rings": rings})
+    return polygons
+
+
+def load_population():
+    wb = openpyxl.load_workbook(RAW / "abs_sa2_population.xlsx", data_only=True, read_only=True)
+    ws = wb["Table 2"]
+    population = {}
+    for row in ws.iter_rows(min_row=7, values_only=True):
+        if not row or row[6] is None:
+            continue
+        try:
+            code = str(int(row[6]))
+            pop_2025 = int(row[9]) if row[9] is not None else None
+            population[code] = pop_2025
+        except (ValueError, TypeError):
+            continue
+    return population
+
+
+def load_stops(sa2_polys):
+    xmin = min(p["bbox"][0] for p in sa2_polys)
+    ymin = min(p["bbox"][1] for p in sa2_polys)
+    xmax = max(p["bbox"][2] for p in sa2_polys)
+    ymax = max(p["bbox"][3] for p in sa2_polys)
+    with (SOURCE / "public_transport_stops.geojson").open(encoding="utf-8") as f:
+        raw = json.load(f)
+    stops = []
+    for feat in raw["features"]:
+        props = feat["properties"]
+        mode = STOP_MODES.get(props.get("MODE"))
+        coords = feat.get("geometry", {}).get("coordinates") or []
+        if not mode or len(coords) < 2:
+            continue
+        x, y = coords[0], coords[1]
+        if xmin <= x <= xmax and ymin <= y <= ymax:
+            stops.append(
+                {
+                    "stop_id": props.get("STOP_ID", ""),
+                    "stop_name": props.get("STOP_NAME", ""),
+                    "mode": mode,
+                    "longitude": round(x, 5),
+                    "latitude": round(y, 5),
+                }
+            )
+    return stops
+
+
+def assign_stops_to_sa2(sa2_polys, stops):
+    counts = {
+        p["attr"]["SA2_CODE21"]: {
+            "total_stops": 0,
+            "train_stops": 0,
+            "tram_stops": 0,
+            "bus_stops": 0,
+            "regional_stops": 0,
+        }
+        for p in sa2_polys
+    }
+    for stop in stops:
+        x, y = stop["longitude"], stop["latitude"]
+        for poly in sa2_polys:
+            xmin, ymin, xmax, ymax = poly["bbox"]
+            if not (xmin <= x <= xmax and ymin <= y <= ymax):
+                continue
+            if any(point_in_ring(x, y, ring) for ring in poly["rings"]):
+                code = poly["attr"]["SA2_CODE21"]
+                counts[code]["total_stops"] += 1
+                key = {
+                    "Train": "train_stops",
+                    "Tram": "tram_stops",
+                    "Bus": "bus_stops",
+                    "Regional": "regional_stops",
+                }[stop["mode"]]
+                counts[code][key] += 1
+                stop["SA2_CODE21"] = code
+                stop["SA2_NAME21"] = poly["attr"]["SA2_NAME21"]
+                break
+    return counts
+
+
+def percentile(values, value):
+    if not values:
+        return 0
+    return sum(v <= value for v in values) / len(values)
+
+
+def write_csv(path, rows, fields):
+    with path.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def build_sa2_outputs(sa2_polys, population, stops, counts):
+    rows = []
+    for poly in sa2_polys:
+        a = poly["attr"]
+        code = a["SA2_CODE21"]
+        c = counts[code]
+        area = float(a["AREASQKM21"])
+        pop = population.get(code)
+        mode_diversity = sum(1 for k in ["train_stops", "tram_stops", "bus_stops", "regional_stops"] if c[k] > 0)
+        rows.append(
+            {
+                "SA2_CODE21": code,
+                "SA2_NAME21": a["SA2_NAME21"],
+                "SA3_NAME21": a["SA3_NAME21"],
+                "SA4_NAME21": a["SA4_NAME21"],
+                "AREASQKM21": round(area, 3),
+                "population": pop or 0,
+                **c,
+                "stops_per_sqkm": round(c["total_stops"] / area, 3) if area else 0,
+                "stops_per_10000_residents": round(c["total_stops"] / pop * 10000, 3) if pop else 0,
+                "mode_diversity": mode_diversity,
+            }
+        )
+    per_capita = [r["stops_per_10000_residents"] for r in rows]
+    density = [r["stops_per_sqkm"] for r in rows]
+    diversity = [r["mode_diversity"] for r in rows]
+    for r in rows:
+        rail_bonus = 15 if r["train_stops"] > 0 else 0
+        tram_bonus = 10 if r["tram_stops"] > 0 else 0
+        score = (
+            percentile(per_capita, r["stops_per_10000_residents"]) * 40
+            + percentile(density, r["stops_per_sqkm"]) * 25
+            + percentile(diversity, r["mode_diversity"]) * 10
+            + rail_bonus
+            + tram_bonus
+        )
+        r["access_score"] = round(min(100, score), 1)
+    fields = [
+        "SA2_CODE21",
+        "SA2_NAME21",
+        "SA3_NAME21",
+        "SA4_NAME21",
+        "AREASQKM21",
+        "population",
+        "total_stops",
+        "train_stops",
+        "tram_stops",
+        "bus_stops",
+        "regional_stops",
+        "stops_per_sqkm",
+        "stops_per_10000_residents",
+        "mode_diversity",
+        "access_score",
+    ]
+    write_csv(PROCESSED / "sa2_access_summary.csv", rows, fields)
+
+    top = sorted(rows, key=lambda r: r["access_score"], reverse=True)[:10]
+    bottom = sorted(rows, key=lambda r: r["access_score"])[:10]
+    ranked = [{**r, "rank_group": "Highest access"} for r in top] + [
+        {**r, "rank_group": "Lowest access"} for r in bottom
+    ]
+    write_csv(PROCESSED / "top_bottom_access.csv", ranked, fields + ["rank_group"])
+
+    features = []
+    row_by_code = {r["SA2_CODE21"]: r for r in rows}
+    for poly in sa2_polys:
+        code = poly["attr"]["SA2_CODE21"]
+        props = {k: row_by_code[code][k] for k in fields}
+        rings = [simplify_ring(ring, 4) for ring in poly["rings"]]
+        features.append(
+            {
+                "type": "Feature",
+                "properties": props,
+                "geometry": {"type": "Polygon" if len(rings) == 1 else "MultiPolygon", "coordinates": [rings[0]] if len(rings) == 1 else [[r] for r in rings]},
+            }
+        )
+    with (PROCESSED / "melbourne_sa2.geojson").open("w", encoding="utf-8") as f:
+        json.dump({"type": "FeatureCollection", "features": features}, f, separators=(",", ":"))
+    return rows
+
+
+def build_stop_outputs(stops):
+    located = [s for s in stops if "SA2_CODE21" in s]
+    write_csv(
+        PROCESSED / "melbourne_stops.csv",
+        located,
+        ["stop_id", "stop_name", "mode", "longitude", "latitude", "SA2_CODE21", "SA2_NAME21"],
+    )
+    mode_counts = [{"mode": m, "stop_count": n} for m, n in Counter(s["mode"] for s in located).most_common()]
+    write_csv(PROCESSED / "mode_counts.csv", mode_counts, ["mode", "stop_count"])
+
+
+def build_route_summary():
+    rows = []
+    feeds = [
+        ("2 - metro train", "Train"),
+        ("3 - metro tram", "Tram"),
+        ("4 - myki", "Bus"),
+    ]
+    for folder, mode in feeds:
+        base = SOURCE / "gtfs" / folder
+        route_names = {}
+        with (base / "routes.txt").open(encoding="utf-8-sig", newline="") as f:
+            for r in csv.DictReader(f):
+                route_names[r["route_id"]] = r.get("route_short_name") or r.get("route_long_name") or r["route_id"]
+        trips = {}
+        trip_counts = Counter()
+        with (base / "trips.txt").open(encoding="utf-8-sig", newline="") as f:
+            for r in csv.DictReader(f):
+                trips[r["trip_id"]] = r["route_id"]
+                trip_counts[r["route_id"]] += 1
+        stops_by_route = defaultdict(set)
+        with (base / "stop_times.txt").open(encoding="utf-8-sig", newline="") as f:
+            for r in csv.DictReader(f):
+                route_id = trips.get(r["trip_id"])
+                if route_id:
+                    stops_by_route[route_id].add(r["stop_id"])
+        for route_id, stops in stops_by_route.items():
+            rows.append(
+                {
+                    "mode": mode,
+                    "route_name": route_names.get(route_id, route_id),
+                    "stop_count": len(stops),
+                    "trip_count": trip_counts[route_id],
+                }
+            )
+    rows = sorted(rows, key=lambda r: r["trip_count"], reverse=True)[:80]
+    write_csv(PROCESSED / "route_summary.csv", rows, ["mode", "route_name", "stop_count", "trip_count"])
+
+
+def build_hourly_service():
+    totals = Counter()
+    feeds = [
+        ("2 - metro train", "Train"),
+        ("3 - metro tram", "Tram"),
+        ("4 - myki", "Bus"),
+    ]
+    for folder, mode in feeds:
+        base = SOURCE / "gtfs" / folder
+        with (base / "stop_times.txt").open(encoding="utf-8-sig", newline="") as f:
+            for r in csv.DictReader(f):
+                t = r.get("departure_time") or r.get("arrival_time") or ""
+                if len(t) >= 2 and t[:2].isdigit() and r.get("stop_sequence") == "1":
+                    totals[(int(t[:2]) % 24, mode)] += 1
+    rows = [{"hour": h, "mode": m, "departures": n} for (h, m), n in sorted(totals.items())]
+    write_csv(PROCESSED / "hourly_service.csv", rows, ["hour", "mode", "departures"])
+
+
+def build_lines(sa2_polys):
+    xmin = min(p["bbox"][0] for p in sa2_polys)
+    ymin = min(p["bbox"][1] for p in sa2_polys)
+    xmax = max(p["bbox"][2] for p in sa2_polys)
+    ymax = max(p["bbox"][3] for p in sa2_polys)
+    with (SOURCE / "public_transport_lines.geojson").open(encoding="utf-8") as f:
+        raw = json.load(f)
+    selected = {}
+    for feat in raw["features"]:
+        props = feat["properties"]
+        mode = STOP_MODES.get(props.get("MODE"))
+        coords = feat.get("geometry", {}).get("coordinates") or []
+        if not mode or not coords:
+            continue
+        if not any(xmin <= x <= xmax and ymin <= y <= ymax for x, y, *rest in coords):
+            continue
+        key = (mode, props.get("SHORT_NAME") or props.get("LONG_NAME") or props.get("HEADSIGN") or "")
+        if key in selected and len(selected[key]["geometry"]["coordinates"]) >= len(coords):
+            continue
+        stride = max(1, len(coords) // 120)
+        simp = [[round(x, 5), round(y, 5)] for x, y, *rest in coords[::stride]]
+        selected[key] = {
+            "type": "Feature",
+            "properties": {
+                "mode": mode,
+                "route": key[1],
+                "headsign": props.get("HEADSIGN", ""),
+                "long_name": props.get("LONG_NAME", ""),
+            },
+            "geometry": {"type": "LineString", "coordinates": simp},
+        }
+    features = list(selected.values())
+    with (PROCESSED / "melbourne_lines.geojson").open("w", encoding="utf-8") as f:
+        json.dump({"type": "FeatureCollection", "features": features}, f, separators=(",", ":"))
+
+
+def spec_base(title, description=None):
+    spec = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "title": {"text": title, "anchor": "start", "fontSize": 18, "font": "Inter, Arial, sans-serif"},
+        "background": "transparent",
+        "config": {
+            "view": {"stroke": None},
+            "axis": {"labelFont": "Inter, Arial, sans-serif", "titleFont": "Inter, Arial, sans-serif"},
+            "legend": {"labelFont": "Inter, Arial, sans-serif", "titleFont": "Inter, Arial, sans-serif"},
+        },
+    }
+    if description:
+        spec["description"] = description
+    return spec
+
+
+def write_specs():
+    mode_domain = list(PALETTE)
+    mode_range = [PALETTE[m] for m in mode_domain]
+    specs = {}
+
+    specs["01_network_map.json"] = {
+        **spec_base("Melbourne's Public Transport Network by Mode"),
+        "width": "container",
+        "height": 520,
+        "projection": {"type": "mercator"},
+        "layer": [
+            {
+                "data": {"url": "data/processed/melbourne_sa2.geojson"},
+                "mark": {"type": "geoshape", "fill": "#f2f4f5", "stroke": "#ccd3d8", "strokeWidth": 0.5},
+            },
+            {
+                "data": {"url": "data/processed/melbourne_lines.geojson"},
+                "mark": {"type": "geoshape", "strokeWidth": 1.6, "opacity": 0.72},
+                "encoding": {
+                    "color": {"field": "mode", "type": "nominal", "scale": {"domain": mode_domain, "range": mode_range}, "title": "Mode"},
+                    "tooltip": [{"field": "route", "title": "Route"}, {"field": "mode", "title": "Mode"}],
+                },
+            },
+        ],
+    }
+
+    specs["02_stop_point_map.json"] = {
+        **spec_base("Every Stop Tells a Location Story"),
+        "width": "container",
+        "height": 520,
+        "projection": {"type": "mercator"},
+        "params": [{"name": "mode_filter", "bind": {"input": "select", "options": [None] + mode_domain, "labels": ["All modes"] + mode_domain, "name": "Mode: "}}],
+        "layer": [
+            {"data": {"url": "data/processed/melbourne_sa2.geojson"}, "mark": {"type": "geoshape", "fill": "#f7f8f7", "stroke": "#d6dddf", "strokeWidth": 0.4}},
+            {
+                "data": {"url": "data/processed/melbourne_stops.csv"},
+                "transform": [{"filter": "mode_filter == null || datum.mode == mode_filter"}],
+                "mark": {"type": "circle", "size": 12, "opacity": 0.52},
+                "encoding": {
+                    "longitude": {"field": "longitude", "type": "quantitative"},
+                    "latitude": {"field": "latitude", "type": "quantitative"},
+                    "color": {"field": "mode", "type": "nominal", "scale": {"domain": mode_domain, "range": mode_range}},
+                    "tooltip": [{"field": "stop_name", "title": "Stop"}, {"field": "mode", "title": "Mode"}, {"field": "SA2_NAME21", "title": "SA2"}],
+                },
+            },
+        ],
+    }
+
+    specs["03_mode_counts_bar.json"] = {
+        **spec_base("Bus Stops Dominate the Stop Network"),
+        "width": "container",
+        "height": 310,
+        "data": {"url": "data/processed/mode_counts.csv"},
+        "mark": {"type": "bar", "cornerRadiusEnd": 3},
+        "encoding": {
+            "x": {"field": "stop_count", "type": "quantitative", "title": "Stops"},
+            "y": {"field": "mode", "type": "nominal", "sort": "-x", "title": None},
+            "color": {"field": "mode", "type": "nominal", "scale": {"domain": mode_domain, "range": mode_range}, "legend": None},
+            "tooltip": [{"field": "mode"}, {"field": "stop_count", "format": ","}],
+        },
+    }
+
+    choropleth_layer = lambda field, title, scale: {
+        **spec_base(title),
+        "width": "container",
+        "height": 500,
+        "projection": {"type": "mercator"},
+        "data": {"url": "data/processed/melbourne_sa2.geojson"},
+        "mark": {"type": "geoshape", "stroke": "white", "strokeWidth": 0.35},
+        "encoding": {
+            "color": {"field": field, "type": "quantitative", "scale": scale, "title": title},
+            "tooltip": [
+                {"field": "SA2_NAME21", "title": "SA2"},
+                {"field": "total_stops", "title": "Total stops", "format": ","},
+                {"field": field, "title": title, "format": ".2f"},
+            ],
+        },
+    }
+    specs["04_stop_density_choropleth.json"] = choropleth_layer("stops_per_sqkm", "Stops per Square Kilometre", {"scheme": "tealblues"})
+    specs["08_population_access_choropleth.json"] = choropleth_layer("stops_per_10000_residents", "Stops per 10,000 Residents", {"scheme": "yellowgreenblue"})
+    specs["11_access_score_choropleth.json"] = choropleth_layer("access_score", "Overall Public Transport Access Score", {"scheme": "viridis", "domain": [0, 100]})
+
+    specs["05_mode_small_multiples.json"] = {
+        **spec_base("Where Each Mode Has a Footprint"),
+        "data": {"url": "data/processed/melbourne_stops.csv"},
+        "facet": {"field": "mode", "type": "nominal", "columns": 2, "title": None},
+        "spec": {
+            "width": 420,
+            "height": 260,
+            "projection": {"type": "mercator"},
+            "layer": [
+                {"data": {"url": "data/processed/melbourne_sa2.geojson"}, "mark": {"type": "geoshape", "fill": "#f5f6f4", "stroke": "#d8dedb", "strokeWidth": 0.25}},
+                {
+                    "mark": {"type": "circle", "size": 8, "opacity": 0.55},
+                    "encoding": {
+                        "longitude": {"field": "longitude", "type": "quantitative"},
+                        "latitude": {"field": "latitude", "type": "quantitative"},
+                        "color": {"field": "mode", "type": "nominal", "scale": {"domain": mode_domain, "range": mode_range}, "legend": None},
+                    },
+                },
+            ],
+        },
+    }
+
+    specs["06_mode_mix_stacked_bar.json"] = {
+        **spec_base("Mode Mix in the Largest Stop Areas"),
+        "width": "container",
+        "height": 390,
+        "data": {"url": "data/processed/sa2_access_summary.csv"},
+        "transform": [
+            {"window": [{"op": "rank", "as": "rank"}], "sort": [{"field": "total_stops", "order": "descending"}]},
+            {"filter": "datum.rank <= 15"},
+            {"fold": ["train_stops", "tram_stops", "bus_stops", "regional_stops"], "as": ["mode_type", "stops"]},
+            {"calculate": "replace(replace(replace(replace(datum.mode_type, '_stops', ''), 'train', 'Train'), 'tram', 'Tram'), 'bus', 'Bus')", "as": "mode_label"},
+            {"calculate": "datum.mode_label == 'regional' ? 'Regional' : datum.mode_label", "as": "mode_label"},
+        ],
+        "mark": {"type": "bar"},
+        "encoding": {
+            "x": {"field": "SA2_NAME21", "type": "nominal", "sort": "-y", "axis": {"labelAngle": -35}, "title": None},
+            "y": {"field": "stops", "type": "quantitative", "title": "Stops"},
+            "color": {"field": "mode_label", "type": "nominal", "scale": {"domain": mode_domain, "range": mode_range}, "title": "Mode"},
+            "tooltip": [{"field": "SA2_NAME21"}, {"field": "mode_label", "title": "Mode"}, {"field": "stops"}],
+        },
+    }
+
+    specs["07_mode_coverage_dotplot.json"] = {
+        **spec_base("Mode Coverage: How Many SA2s Have Each Option?"),
+        "width": "container",
+        "height": 280,
+        "data": {"url": "data/processed/sa2_access_summary.csv"},
+        "transform": [
+            {"fold": ["train_stops", "tram_stops", "bus_stops", "regional_stops"], "as": ["mode_type", "stops"]},
+            {"filter": "datum.stops > 0"},
+            {"calculate": "replace(replace(replace(replace(datum.mode_type, '_stops', ''), 'train', 'Train'), 'tram', 'Tram'), 'bus', 'Bus')", "as": "mode_label"},
+            {"calculate": "datum.mode_label == 'regional' ? 'Regional' : datum.mode_label", "as": "mode_label"},
+            {"aggregate": [{"op": "count", "as": "sa2_count"}], "groupby": ["mode_label"]},
+        ],
+        "mark": {"type": "circle", "size": 260, "opacity": 0.9},
+        "encoding": {
+            "x": {"field": "sa2_count", "type": "quantitative", "title": "SA2s with at least one stop"},
+            "y": {"field": "mode_label", "type": "nominal", "sort": "-x", "title": None},
+            "color": {"field": "mode_label", "type": "nominal", "scale": {"domain": mode_domain, "range": mode_range}, "legend": None},
+            "tooltip": [{"field": "mode_label", "title": "Mode"}, {"field": "sa2_count", "title": "SA2s"}],
+        },
+    }
+
+    specs["09_population_vs_stops_scatter.json"] = {
+        **spec_base("Population and Stop Supply Do Not Always Move Together"),
+        "width": "container",
+        "height": 390,
+        "data": {"url": "data/processed/sa2_access_summary.csv"},
+        "mark": {"type": "circle", "opacity": 0.68, "size": 70},
+        "encoding": {
+            "x": {"field": "population", "type": "quantitative", "title": "Population, 2025", "scale": {"type": "sqrt"}},
+            "y": {"field": "total_stops", "type": "quantitative", "title": "Total stops", "scale": {"type": "sqrt"}},
+            "color": {"field": "access_score", "type": "quantitative", "scale": {"scheme": "viridis"}, "title": "Access score"},
+            "tooltip": [{"field": "SA2_NAME21", "title": "SA2"}, {"field": "population", "format": ","}, {"field": "total_stops"}, {"field": "access_score"}],
+        },
+    }
+
+    specs["10_ranked_access_bar.json"] = {
+        **spec_base("The Highest and Lowest Access Scores"),
+        "width": "container",
+        "height": 430,
+        "data": {"url": "data/processed/top_bottom_access.csv"},
+        "mark": {"type": "bar", "cornerRadiusEnd": 3},
+        "encoding": {
+            "x": {"field": "access_score", "type": "quantitative", "title": "Access score"},
+            "y": {"field": "SA2_NAME21", "type": "nominal", "sort": "-x", "title": None},
+            "color": {"field": "rank_group", "type": "nominal", "scale": {"domain": ["Highest access", "Lowest access"], "range": ["#2a9d8f", "#d95f4f"]}, "title": None},
+            "tooltip": [{"field": "SA2_NAME21"}, {"field": "rank_group"}, {"field": "access_score"}],
+        },
+    }
+
+    specs["12_hourly_service_heatmap.json"] = {
+        **spec_base("Service Starts Cluster Around the Daily Peaks"),
+        "width": "container",
+        "height": 240,
+        "data": {"url": "data/processed/hourly_service.csv"},
+        "mark": {"type": "rect"},
+        "encoding": {
+            "x": {"field": "hour", "type": "ordinal", "title": "Hour of day"},
+            "y": {"field": "mode", "type": "nominal", "title": None},
+            "color": {"field": "departures", "type": "quantitative", "scale": {"scheme": "blues"}, "title": "Departures"},
+            "tooltip": [{"field": "mode"}, {"field": "hour"}, {"field": "departures", "format": ","}],
+        },
+    }
+
+    for name, spec in specs.items():
+        with (VEGA / name).open("w", encoding="utf-8") as f:
+            json.dump(spec, f, indent=2)
+
+
+def write_site():
+    index = """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public Transport Accessibility Across Melbourne</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <p class="eyebrow">FIT2179 Data Visualisation 2</p>
+      <h1>Public Transport Accessibility Across Melbourne</h1>
+      <p class="lede">Melbourne's public transport network is dense in some places and thin in others. This data story compares stops, modes, population and area to ask a simple question: where does access look strongest, and where might residents need more attention?</p>
+      <div class="hero__stats">
+        <div><strong>2025</strong><span>ABS population year</span></div>
+        <div><strong>Greater Melbourne</strong><span>SA2 analysis area</span></div>
+        <div><strong>12</strong><span>Vega-Lite views</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="story-section">
+      <p class="section-kicker">1. Introduction</p>
+      <h2>Start with the shape of the network</h2>
+      <p>Train and tram lines create strong corridors, while bus services spread access across far more suburbs. The first two maps show the difference between route structure and stop-level access.</p>
+      <div id="network_map" class="vis large"></div>
+      <div id="stop_point_map" class="vis large"></div>
+      <div id="mode_counts_bar" class="vis"></div>
+    </section>
+
+    <section class="story-section">
+      <p class="section-kicker">2. Stop locations</p>
+      <h2>Stop density reveals the inner-city advantage</h2>
+      <p>Counting stops by area highlights where public transport is physically close together. This favours compact inner SA2s, so it should be read as a spatial intensity measure rather than a complete accessibility score.</p>
+      <div id="stop_density_choropleth" class="vis large"></div>
+      <div id="mode_small_multiples" class="vis large"></div>
+    </section>
+
+    <section class="story-section">
+      <p class="section-kicker">3. Mode distribution</p>
+      <h2>Having stops is not the same as having choices</h2>
+      <p>Some areas have many stops but mostly one mode. Others have fewer stops but benefit from a stronger mode mix, especially where train or tram services sit close to buses.</p>
+      <div id="mode_mix_stacked_bar" class="vis"></div>
+      <div id="mode_coverage_dotplot" class="vis"></div>
+      <div id="hourly_service_heatmap" class="vis"></div>
+    </section>
+
+    <section class="story-section">
+      <p class="section-kicker">4. Population vs access</p>
+      <h2>High population does not guarantee high stop supply</h2>
+      <p>Normalising by population changes the picture. A suburb can look well supplied in raw stop counts but less generous once the number of residents is considered.</p>
+      <div id="population_access_choropleth" class="vis large"></div>
+      <div id="population_vs_stops_scatter" class="vis"></div>
+    </section>
+
+    <section class="story-section">
+      <p class="section-kicker">5. Final access score</p>
+      <h2>A simple score brings the signals together</h2>
+      <p>The final score combines stops per resident, stops per square kilometre, mode diversity, and rail/tram availability. It is not an official measure, but it helps compare areas consistently and makes the trade-offs visible.</p>
+      <div id="ranked_access_bar" class="vis"></div>
+      <div id="access_score_choropleth" class="vis large"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>Author:</strong> Student name | <strong>Unit:</strong> FIT2179 Data Visualisation | <strong>Date:</strong> May 2026</p>
+    <p><strong>Sources:</strong> Public Transport Victoria GTFS and public transport spatial data; Australian Bureau of Statistics Regional population 2024-25; ABS ASGS Edition 3 SA2 boundaries.</p>
+    <p><strong>AI acknowledgement:</strong> Generative AI assistance was used to help structure code, process data, and refine written explanations. Final design decisions and submitted work should be reviewed by the author.</p>
+  </footer>
+  <script src="js/main.js"></script>
+</body>
+</html>
+"""
+    css = """:root {
+  --ink: #172026;
+  --muted: #5c6970;
+  --line: #dce3e6;
+  --paper: #fbfaf7;
+  --panel: #ffffff;
+  --accent: #2364aa;
+  --accent-2: #2a9d8f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Inter, Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.hero {
+  background: linear-gradient(120deg, rgba(35, 100, 170, 0.95), rgba(42, 157, 143, 0.86)), url("../assets/draft_page_1.png");
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  min-height: 86vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero__inner,
+main,
+footer {
+  width: min(1120px, calc(100vw - 36px));
+  margin: 0 auto;
+}
+
+.eyebrow,
+.section-kicker {
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+h1,
+h2 {
+  font-family: "Source Serif 4", Georgia, serif;
+  line-height: 1.05;
+  margin: 0;
+}
+
+h1 {
+  max-width: 920px;
+  font-size: clamp(3rem, 8vw, 6.8rem);
+}
+
+h2 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  max-width: 900px;
+}
+
+.lede {
+  max-width: 760px;
+  margin: 26px 0;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+}
+
+.hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  width: min(760px, 100%);
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.hero__stats div {
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.hero__stats strong,
+.hero__stats span {
+  display: block;
+}
+
+.hero__stats strong {
+  font-size: 1.25rem;
+}
+
+.hero__stats span {
+  opacity: 0.86;
+  font-size: 0.92rem;
+}
+
+.story-section {
+  padding: 84px 0 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.story-section p {
+  max-width: 780px;
+  color: var(--muted);
+  font-size: 1.02rem;
+}
+
+.section-kicker {
+  color: var(--accent);
+}
+
+.vis {
+  width: 100%;
+  margin: 28px 0;
+  padding: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow-x: auto;
+  box-shadow: 0 10px 28px rgba(24, 39, 46, 0.06);
+}
+
+.vis.large {
+  min-height: 460px;
+}
+
+.vega-embed {
+  width: 100%;
+}
+
+footer {
+  padding: 42px 0 64px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+footer p {
+  margin: 0 0 10px;
+}
+
+@media (max-width: 760px) {
+  .hero {
+    min-height: 92vh;
+  }
+
+  .hero__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .story-section {
+    padding-top: 58px;
+  }
+
+  .vis {
+    padding: 12px;
+  }
+}
+"""
+    main_js = """const charts = [
+  ["#network_map", "js/vega/01_network_map.json"],
+  ["#stop_point_map", "js/vega/02_stop_point_map.json"],
+  ["#mode_counts_bar", "js/vega/03_mode_counts_bar.json"],
+  ["#stop_density_choropleth", "js/vega/04_stop_density_choropleth.json"],
+  ["#mode_small_multiples", "js/vega/05_mode_small_multiples.json"],
+  ["#mode_mix_stacked_bar", "js/vega/06_mode_mix_stacked_bar.json"],
+  ["#mode_coverage_dotplot", "js/vega/07_mode_coverage_dotplot.json"],
+  ["#population_access_choropleth", "js/vega/08_population_access_choropleth.json"],
+  ["#population_vs_stops_scatter", "js/vega/09_population_vs_stops_scatter.json"],
+  ["#ranked_access_bar", "js/vega/10_ranked_access_bar.json"],
+  ["#access_score_choropleth", "js/vega/11_access_score_choropleth.json"],
+  ["#hourly_service_heatmap", "js/vega/12_hourly_service_heatmap.json"]
+];
+
+const embedOptions = {
+  actions: false,
+  renderer: "svg"
+};
+
+charts.forEach(([target, spec]) => {
+  vegaEmbed(target, spec, embedOptions).catch((error) => {
+    const el = document.querySelector(target);
+    if (el) {
+      el.innerHTML = `<p class="error">This visualisation could not load: ${error.message}</p>`;
+    }
+    console.error(error);
+  });
+});
+"""
+    readme = """# Public Transport Accessibility Across Melbourne
+
+FIT2179 Data Visualisation 2 project.
+
+## Local preview
+
+Open `index.html` with VS Code Live Server. The page uses Vega, Vega-Lite and Vega-Embed from CDN links, so an internet connection is needed for local preview.
+
+## Data sources
+
+- Public Transport Victoria GTFS and public transport spatial datasets supplied for the assignment.
+- Australian Bureau of Statistics, Regional population 2024-25, data cube 32180DS0001.
+- Australian Bureau of Statistics ASGS Edition 3 SA2 boundaries.
+
+## Notes
+
+Large raw files are intentionally excluded from the website. The page uses compact files in `data/processed`.
+
+## Rebuilding processed data
+
+The reproducible build script is in `scripts/build_fit2179_a2.py`. It reads the supplied raw transport and SA2 files from the local FIT2179 folder, joins ABS population data, creates compact processed files, and regenerates the Vega-Lite specs and webpage.
+"""
+    gitignore = """# Keep accidental huge transport files out of GitHub.
+data/raw/*
+!data/raw/abs_sa2_population.xlsx
+
+# Local development noise.
+.DS_Store
+Thumbs.db
+*.log
+"""
+    (PROJECT / "index.html").write_text(index, encoding="utf-8")
+    (PROJECT / "css" / "style.css").write_text(css, encoding="utf-8")
+    (PROJECT / "js" / "main.js").write_text(main_js, encoding="utf-8")
+    (PROJECT / "README.md").write_text(readme, encoding="utf-8")
+    (PROJECT / ".gitignore").write_text(gitignore, encoding="utf-8")
+
+
+def copy_assets():
+    draft_png = SOURCE / "draft_page_1.png"
+    if draft_png.exists():
+        shutil.copyfile(draft_png, PROJECT / "assets" / "draft_page_1.png")
+    src_sketch = Path(r"C:\Users\hp\Downloads\fit2179 a2 draft.pdf")
+    if src_sketch.exists():
+        shutil.copyfile(src_sketch, PROJECT / "sketch" / "fit2179_a2_sketch.pdf")
+    this_script = Path(__file__)
+    verify_script = this_script.with_name("verify_fit2179_a2.py")
+    if this_script.exists():
+        shutil.copyfile(this_script, PROJECT / "scripts" / "build_fit2179_a2.py")
+    if verify_script.exists():
+        shutil.copyfile(verify_script, PROJECT / "scripts" / "verify_fit2179_a2.py")
+
+
+def main():
+    ensure_dirs()
+    copy_assets()
+    sa2_polys = load_sa2()
+    population = load_population()
+    stops = load_stops(sa2_polys)
+    counts = assign_stops_to_sa2(sa2_polys, stops)
+    rows = build_sa2_outputs(sa2_polys, population, stops, counts)
+    build_stop_outputs(stops)
+    build_lines(sa2_polys)
+    build_route_summary()
+    build_hourly_service()
+    write_specs()
+    write_site()
+    total_size = sum(p.stat().st_size for p in PROCESSED.glob("*") if p.is_file())
+    missing_pop = sum(1 for r in rows if not r["population"])
+    print(f"SA2 polygons: {len(sa2_polys)}")
+    print(f"Stops assigned: {sum(1 for s in stops if 'SA2_CODE21' in s)}")
+    print(f"Missing population rows: {missing_pop}")
+    print(f"Processed data size: {total_size / 1024 / 1024:.2f} MB")
+
+
+if __name__ == "__main__":
+    main()

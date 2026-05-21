@@ -1,0 +1,82 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Melbourne's Public Transport Network by Mode",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 520,
+  "projection": {
+    "type": "mercator"
+  },
+  "layer": [
+    {
+      "data": {
+        "url": "data/processed/melbourne_sa2.geojson"
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "#f2f4f5",
+        "stroke": "#ccd3d8",
+        "strokeWidth": 0.5
+      }
+    },
+    {
+      "data": {
+        "url": "data/processed/melbourne_lines.geojson"
+      },
+      "mark": {
+        "type": "geoshape",
+        "strokeWidth": 1.6,
+        "opacity": 0.72
+      },
+      "encoding": {
+        "color": {
+          "field": "mode",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "Train",
+              "Tram",
+              "Bus",
+              "Regional"
+            ],
+            "range": [
+              "#2364aa",
+              "#2a9d8f",
+              "#e76f51",
+              "#7b2cbf"
+            ]
+          },
+          "title": "Mode"
+        },
+        "tooltip": [
+          {
+            "field": "route",
+            "title": "Route"
+          },
+          {
+            "field": "mode",
+            "title": "Mode"
+          }
+        ]
+      }
+    }
+  ]
+}

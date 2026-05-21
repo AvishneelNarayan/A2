@@ -1,0 +1,73 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Bus Stops Dominate the Stop Network",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 310,
+  "data": {
+    "url": "data/processed/mode_counts.csv"
+  },
+  "mark": {
+    "type": "bar",
+    "cornerRadiusEnd": 3
+  },
+  "encoding": {
+    "x": {
+      "field": "stop_count",
+      "type": "quantitative",
+      "title": "Stops"
+    },
+    "y": {
+      "field": "mode",
+      "type": "nominal",
+      "sort": "-x",
+      "title": null
+    },
+    "color": {
+      "field": "mode",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "Train",
+          "Tram",
+          "Bus",
+          "Regional"
+        ],
+        "range": [
+          "#2364aa",
+          "#2a9d8f",
+          "#e76f51",
+          "#7b2cbf"
+        ]
+      },
+      "legend": null
+    },
+    "tooltip": [
+      {
+        "field": "mode"
+      },
+      {
+        "field": "stop_count",
+        "format": ","
+      }
+    ]
+  }
+}

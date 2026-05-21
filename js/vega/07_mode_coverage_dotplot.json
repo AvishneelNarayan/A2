@@ -1,0 +1,111 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Mode Coverage: How Many SA2s Have Each Option?",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 280,
+  "data": {
+    "url": "data/processed/sa2_access_summary.csv"
+  },
+  "transform": [
+    {
+      "fold": [
+        "train_stops",
+        "tram_stops",
+        "bus_stops",
+        "regional_stops"
+      ],
+      "as": [
+        "mode_type",
+        "stops"
+      ]
+    },
+    {
+      "filter": "datum.stops > 0"
+    },
+    {
+      "calculate": "replace(replace(replace(replace(datum.mode_type, '_stops', ''), 'train', 'Train'), 'tram', 'Tram'), 'bus', 'Bus')",
+      "as": "mode_label"
+    },
+    {
+      "calculate": "datum.mode_label == 'regional' ? 'Regional' : datum.mode_label",
+      "as": "mode_label"
+    },
+    {
+      "aggregate": [
+        {
+          "op": "count",
+          "as": "sa2_count"
+        }
+      ],
+      "groupby": [
+        "mode_label"
+      ]
+    }
+  ],
+  "mark": {
+    "type": "circle",
+    "size": 260,
+    "opacity": 0.9
+  },
+  "encoding": {
+    "x": {
+      "field": "sa2_count",
+      "type": "quantitative",
+      "title": "SA2s with at least one stop"
+    },
+    "y": {
+      "field": "mode_label",
+      "type": "nominal",
+      "sort": "-x",
+      "title": null
+    },
+    "color": {
+      "field": "mode_label",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "Train",
+          "Tram",
+          "Bus",
+          "Regional"
+        ],
+        "range": [
+          "#2364aa",
+          "#2a9d8f",
+          "#e76f51",
+          "#7b2cbf"
+        ]
+      },
+      "legend": null
+    },
+    "tooltip": [
+      {
+        "field": "mode_label",
+        "title": "Mode"
+      },
+      {
+        "field": "sa2_count",
+        "title": "SA2s"
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Stops per Square Kilometre",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 500,
+  "projection": {
+    "type": "mercator"
+  },
+  "data": {
+    "url": "data/processed/melbourne_sa2.geojson"
+  },
+  "mark": {
+    "type": "geoshape",
+    "stroke": "white",
+    "strokeWidth": 0.35
+  },
+  "encoding": {
+    "color": {
+      "field": "stops_per_sqkm",
+      "type": "quantitative",
+      "scale": {
+        "scheme": "tealblues"
+      },
+      "title": "Stops per Square Kilometre"
+    },
+    "tooltip": [
+      {
+        "field": "SA2_NAME21",
+        "title": "SA2"
+      },
+      {
+        "field": "total_stops",
+        "title": "Total stops",
+        "format": ","
+      },
+      {
+        "field": "stops_per_sqkm",
+        "title": "Stops per Square Kilometre",
+        "format": ".2f"
+      }
+    ]
+  }
+}

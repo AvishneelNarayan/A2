@@ -1,0 +1,63 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Service Starts Cluster Around the Daily Peaks",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 240,
+  "data": {
+    "url": "data/processed/hourly_service.csv"
+  },
+  "mark": {
+    "type": "rect"
+  },
+  "encoding": {
+    "x": {
+      "field": "hour",
+      "type": "ordinal",
+      "title": "Hour of day"
+    },
+    "y": {
+      "field": "mode",
+      "type": "nominal",
+      "title": null
+    },
+    "color": {
+      "field": "departures",
+      "type": "quantitative",
+      "scale": {
+        "scheme": "blues"
+      },
+      "title": "Departures"
+    },
+    "tooltip": [
+      {
+        "field": "mode"
+      },
+      {
+        "field": "hour"
+      },
+      {
+        "field": "departures",
+        "format": ","
+      }
+    ]
+  }
+}

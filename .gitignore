@@ -1,0 +1,8 @@
+# Keep accidental huge transport files out of GitHub.
+data/raw/*
+!data/raw/abs_sa2_population.xlsx
+
+# Local development noise.
+.DS_Store
+Thumbs.db
+*.log

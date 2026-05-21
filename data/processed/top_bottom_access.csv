@@ -1,0 +1,21 @@
+SA2_CODE21,SA2_NAME21,SA3_NAME21,SA4_NAME21,AREASQKM21,population,total_stops,train_stops,tram_stops,bus_stops,regional_stops,stops_per_sqkm,stops_per_10000_residents,mode_diversity,access_score,rank_group
+206041119,East Melbourne,Melbourne City,Melbourne - Inner,2.9,5245,85,41,34,10,0,29.312,162.059,3,98.3,Highest access
+213031348,Footscray,Maribyrnong,Melbourne - West,4.967,20882,196,84,15,96,1,39.46,93.861,4,98.2,Highest access
+206031502,Essendon - East,Essendon,Melbourne - Inner,3.554,13196,121,40,17,64,0,34.043,91.694,3,97.9,Highest access
+206061135,Armadale,Stonnington - West,Melbourne - Inner,2.183,10032,87,25,40,22,0,39.844,86.722,3,97.9,Highest access
+206041505,Melbourne CBD - West,Melbourne City,Melbourne - Inner,1.005,22163,181,118,40,23,0,180.082,81.668,3,97.8,Highest access
+209021526,Reservoir - South West,Darebin - North,Melbourne - North East,5.625,15350,129,26,1,102,0,22.935,84.039,3,95.5,Highest access
+206071517,Richmond (South) - Cremorne,Yarra,Melbourne - Inner,4.289,19225,135,87,45,3,0,31.475,70.221,3,95.2,Highest access
+209021525,Reservoir - South East,Darebin - North,Melbourne - North East,4.178,14143,101,1,12,88,0,24.173,71.413,3,94.0,Highest access
+209021428,Preston - East,Darebin - North,Melbourne - North East,7.746,23403,168,22,17,129,0,21.689,71.786,3,93.5,Highest access
+207011149,Camberwell,Boroondara,Melbourne - Inner East,7.292,22052,157,50,57,50,0,21.531,71.195,3,93.2,Highest access
+209031212,Panton Hill - St Andrews,Nillumbik - Kinglake,Melbourne - North East,292.198,5130,2,0,0,2,0,0.007,3.899,1,4.3,Lowest access
+213041574,Fraser Rise - Plumpton,Melton - Bacchus Marsh,Melbourne - West,58.731,24739,11,0,0,11,0,0.187,4.446,1,5.2,Lowest access
+213051579,Manor Lakes - Quandong,Wyndham,Melbourne - West,72.034,13667,14,0,0,14,0,0.194,10.244,1,6.0,Lowest access
+213051582,Tarneit (West) - Mount Cottrell,Wyndham,Melbourne - West,36.706,19169,19,0,0,19,0,0.518,9.912,1,6.6,Lowest access
+209041437,Wollert,Whittlesea - Wallan,Melbourne - North East,53.892,36658,37,0,0,37,0,0.687,10.093,1,7.1,Lowest access
+213051589,Wyndham Vale - North,Wyndham,Melbourne - West,51.25,14515,22,0,0,22,0,0.429,15.157,1,7.8,Lowest access
+214011376,Skye - Sandhurst,Frankston,Mornington Peninsula,19.815,13601,17,0,0,17,0,0.858,12.499,1,8.2,Lowest access
+212011548,Koo Wee Rup,Cardinia,Melbourne - South East,414.663,12598,6,0,0,3,3,0.014,4.763,2,8.3,Lowest access
+214021378,Flinders,Mornington Peninsula,Mornington Peninsula,287.379,6064,12,0,0,12,0,0.042,19.789,1,8.3,Lowest access
+212031558,Cranbourne East - South,Casey - South,Melbourne - South East,5.327,15590,13,0,0,13,0,2.44,8.339,1,9.3,Lowest access

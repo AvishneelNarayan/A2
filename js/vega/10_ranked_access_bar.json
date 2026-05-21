@@ -1,0 +1,71 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "The Highest and Lowest Access Scores",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 430,
+  "data": {
+    "url": "data/processed/top_bottom_access.csv"
+  },
+  "mark": {
+    "type": "bar",
+    "cornerRadiusEnd": 3
+  },
+  "encoding": {
+    "x": {
+      "field": "access_score",
+      "type": "quantitative",
+      "title": "Access score"
+    },
+    "y": {
+      "field": "SA2_NAME21",
+      "type": "nominal",
+      "sort": "-x",
+      "title": null
+    },
+    "color": {
+      "field": "rank_group",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "Highest access",
+          "Lowest access"
+        ],
+        "range": [
+          "#2a9d8f",
+          "#d95f4f"
+        ]
+      },
+      "title": null
+    },
+    "tooltip": [
+      {
+        "field": "SA2_NAME21"
+      },
+      {
+        "field": "rank_group"
+      },
+      {
+        "field": "access_score"
+      }
+    ]
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Every Stop Tells a Location Story",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 520,
+  "projection": {
+    "type": "mercator"
+  },
+  "params": [
+    {
+      "name": "mode_filter",
+      "bind": {
+        "input": "select",
+        "options": [
+          null,
+          "Train",
+          "Tram",
+          "Bus",
+          "Regional"
+        ],
+        "labels": [
+          "All modes",
+          "Train",
+          "Tram",
+          "Bus",
+          "Regional"
+        ],
+        "name": "Mode: "
+      }
+    }
+  ],
+  "layer": [
+    {
+      "data": {
+        "url": "data/processed/melbourne_sa2.geojson"
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "#f7f8f7",
+        "stroke": "#d6dddf",
+        "strokeWidth": 0.4
+      }
+    },
+    {
+      "data": {
+        "url": "data/processed/melbourne_stops.csv"
+      },
+      "transform": [
+        {
+          "filter": "mode_filter == null || datum.mode == mode_filter"
+        }
+      ],
+      "mark": {
+        "type": "circle",
+        "size": 12,
+        "opacity": 0.52
+      },
+      "encoding": {
+        "longitude": {
+          "field": "longitude",
+          "type": "quantitative"
+        },
+        "latitude": {
+          "field": "latitude",
+          "type": "quantitative"
+        },
+        "color": {
+          "field": "mode",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "Train",
+              "Tram",
+              "Bus",
+              "Regional"
+            ],
+            "range": [
+              "#2364aa",
+              "#2a9d8f",
+              "#e76f51",
+              "#7b2cbf"
+            ]
+          }
+        },
+        "tooltip": [
+          {
+            "field": "stop_name",
+            "title": "Stop"
+          },
+          {
+            "field": "mode",
+            "title": "Mode"
+          },
+          {
+            "field": "SA2_NAME21",
+            "title": "SA2"
+          }
+        ]
+      }
+    }
+  ]
+}
