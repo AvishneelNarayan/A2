@@ -23,7 +23,7 @@
   "width": "container",
   "height": 430,
   "data": {
-    "url": "../../data/processed/top_bottom_access.csv"
+    "url": "data/processed/top_bottom_access.csv"
   },
   "mark": {
     "type": "bar",

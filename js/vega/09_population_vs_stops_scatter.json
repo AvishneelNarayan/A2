@@ -23,7 +23,7 @@
   "width": "container",
   "height": 390,
   "data": {
-    "url": "../../data/processed/sa2_access_summary.csv"
+    "url": "data/processed/sa2_access_summary.csv"
   },
   "mark": {
     "type": "circle",

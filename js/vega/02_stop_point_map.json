@@ -51,7 +51,7 @@
   "layer": [
     {
       "data": {
-        "url": "../../data/processed/melbourne_sa2.geojson",
+        "url": "data/processed/melbourne_sa2.geojson",
         "format": {
           "type": "json",
           "property": "features"
@@ -66,7 +66,7 @@
     },
     {
       "data": {
-        "url": "../../data/processed/melbourne_stops.csv"
+        "url": "data/processed/melbourne_stops.csv"
       },
       "transform": [
         {
