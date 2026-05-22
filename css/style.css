@@ -127,6 +127,20 @@ h2 {
   min-height: 460px;
 }
 
+.scrollable-vis {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.scrollable-vis .vega-embed {
+  min-width: 1500px;
+}
+
+.scrollable-vis svg {
+  max-width: none;
+  min-width: 1500px;
+}
+
 .vega-embed {
   width: 100%;
 }

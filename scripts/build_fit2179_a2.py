@@ -533,15 +533,15 @@ def write_specs():
     specs["05_mode_small_multiples.json"] = {
         **spec_base("Where Each Mode Has a Footprint"),
         "data": {"url": "data/processed/melbourne_stops.csv"},
-        "facet": {"field": "mode", "type": "nominal", "columns": 2, "title": None},
+        "facet": {"field": "mode", "type": "nominal", "columns": 4, "title": None},
         "spec": {
-            "width": 360,
-            "height": 260,
+            "width": 330,
+            "height": 360,
             "projection": {"type": "mercator"},
             "layer": [
                 {"data": {"url": "data/processed/melbourne_sa2.geojson", "format": {"type": "json", "property": "features"}}, "mark": {"type": "geoshape", "fill": "#f5f6f4", "stroke": "#d8dedb", "strokeWidth": 0.25}},
                 {
-                    "mark": {"type": "circle", "size": 8, "opacity": 0.55},
+                    "mark": {"type": "circle", "size": 14, "opacity": 0.7},
                     "encoding": {
                         "longitude": {"field": "longitude", "type": "quantitative"},
                         "latitude": {"field": "latitude", "type": "quantitative"},
@@ -651,7 +651,7 @@ def write_site():
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260522b">
+  <link rel="stylesheet" href="css/style.css?v=20260522d">
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -685,7 +685,7 @@ def write_site():
       <h2>Stop density reveals the inner-city advantage</h2>
       <p>Counting stops by area highlights where public transport is physically close together. This favours compact inner SA2s, so it should be read as a spatial intensity measure rather than a complete accessibility score.</p>
       <div id="stop_density_choropleth" class="vis large"></div>
-      <div id="mode_small_multiples" class="vis large"></div>
+      <div id="mode_small_multiples" class="vis large scrollable-vis"></div>
     </section>
 
     <section class="story-section">
@@ -852,6 +852,20 @@ h2 {
   min-height: 460px;
 }
 
+.scrollable-vis {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.scrollable-vis .vega-embed {
+  min-width: 1500px;
+}
+
+.scrollable-vis svg {
+  max-width: none;
+  min-width: 1500px;
+}
+
 .vega-embed {
   width: 100%;
 }
@@ -894,7 +908,7 @@ footer p {
   ["#stop_point_map", "js/vega/02_stop_point_map.json?v=20260522c"],
   ["#mode_counts_bar", "js/vega/03_mode_counts_bar.json?v=20260522c"],
   ["#stop_density_choropleth", "js/vega/04_stop_density_choropleth.json?v=20260522c"],
-  ["#mode_small_multiples", "js/vega/05_mode_small_multiples.json?v=20260522c"],
+  ["#mode_small_multiples", "js/vega/05_mode_small_multiples.json?v=20260522d"],
   ["#mode_mix_stacked_bar", "js/vega/06_mode_mix_stacked_bar.json?v=20260522c"],
   ["#mode_coverage_dotplot", "js/vega/07_mode_coverage_dotplot.json?v=20260522c"],
   ["#population_access_choropleth", "js/vega/08_population_access_choropleth.json?v=20260522c"],

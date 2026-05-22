@@ -26,12 +26,12 @@
   "facet": {
     "field": "mode",
     "type": "nominal",
-    "columns": 2,
+    "columns": 4,
     "title": null
   },
         "spec": {
-            "width": 360,
-            "height": 260,
+            "width": 330,
+            "height": 360,
     "projection": {
       "type": "mercator"
     },
@@ -54,8 +54,8 @@
       {
         "mark": {
           "type": "circle",
-          "size": 8,
-          "opacity": 0.55
+          "size": 14,
+          "opacity": 0.7
         },
         "encoding": {
           "longitude": {
