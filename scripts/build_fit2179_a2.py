@@ -651,7 +651,7 @@ def write_site():
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260522d">
+  <link rel="stylesheet" href="css/style.css?v=20260529a">
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -661,6 +661,7 @@ def write_site():
     <div class="hero__inner">
       <p class="eyebrow">FIT2179 Data Visualisation 2</p>
       <h1>Public Transport Accessibility Across Melbourne</h1>
+      <p class="byline">By Avishneel Sagar Narayan</p>
       <p class="lede">Melbourne's public transport network is dense in some places and thin in others. This data story compares stops, modes, population and area to ask a simple question: where does access look strongest, and where might residents need more attention?</p>
       <div class="hero__stats">
         <div><strong>2025</strong><span>ABS population year</span></div>
@@ -746,13 +747,17 @@ body {
 }
 
 .hero {
-  background: linear-gradient(120deg, rgba(35, 100, 170, 0.95), rgba(42, 157, 143, 0.86)), url("../assets/draft_page_1.png");
+  background: linear-gradient(120deg, rgba(12, 36, 55, 0.78), rgba(20, 96, 103, 0.58)), url("../assets/hero_ptv_transport.png");
   background-size: cover;
   background-position: center;
   color: #fff;
-  min-height: 86vh;
+  min-height: 82vh;
   display: flex;
   align-items: center;
+}
+
+.hero__inner {
+  text-align: center;
 }
 
 .hero__inner,
@@ -779,8 +784,9 @@ h2 {
 }
 
 h1 {
-  max-width: 920px;
-  font-size: clamp(3rem, 8vw, 6.8rem);
+  max-width: 940px;
+  margin: 0 auto;
+  font-size: clamp(2.6rem, 6vw, 5rem);
 }
 
 h2 {
@@ -790,8 +796,15 @@ h2 {
 
 .lede {
   max-width: 760px;
-  margin: 26px 0;
+  margin: 22px auto 28px;
   font-size: clamp(1.05rem, 2vw, 1.35rem);
+}
+
+.byline {
+  margin: 18px 0 0;
+  font-size: clamp(1rem, 1.8vw, 1.28rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .hero__stats {
@@ -799,6 +812,7 @@ h2 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
   width: min(760px, 100%);
+  margin: 0 auto;
   background: rgba(255, 255, 255, 0.28);
   border: 1px solid rgba(255, 255, 255, 0.32);
 }

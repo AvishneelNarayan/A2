@@ -21,13 +21,17 @@ body {
 }
 
 .hero {
-  background: linear-gradient(120deg, rgba(35, 100, 170, 0.95), rgba(42, 157, 143, 0.86)), url("../assets/draft_page_1.png");
+  background: linear-gradient(120deg, rgba(12, 36, 55, 0.78), rgba(20, 96, 103, 0.58)), url("../assets/hero_ptv_transport.png");
   background-size: cover;
   background-position: center;
   color: #fff;
-  min-height: 86vh;
+  min-height: 82vh;
   display: flex;
   align-items: center;
+}
+
+.hero__inner {
+  text-align: center;
 }
 
 .hero__inner,
@@ -54,8 +58,9 @@ h2 {
 }
 
 h1 {
-  max-width: 920px;
-  font-size: clamp(3rem, 8vw, 6.8rem);
+  max-width: 940px;
+  margin: 0 auto;
+  font-size: clamp(2.6rem, 6vw, 5rem);
 }
 
 h2 {
@@ -65,8 +70,15 @@ h2 {
 
 .lede {
   max-width: 760px;
-  margin: 26px 0;
+  margin: 22px auto 28px;
   font-size: clamp(1.05rem, 2vw, 1.35rem);
+}
+
+.byline {
+  margin: 18px 0 0;
+  font-size: clamp(1rem, 1.8vw, 1.28rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .hero__stats {
@@ -74,6 +86,7 @@ h2 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
   width: min(760px, 100%);
+  margin: 0 auto;
   background: rgba(255, 255, 255, 0.28);
   border: 1px solid rgba(255, 255, 255, 0.32);
 }
