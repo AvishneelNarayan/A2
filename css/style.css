@@ -153,6 +153,29 @@ h2 {
   height: auto;
 }
 
+.vis[data-note] {
+  padding-bottom: 78px;
+}
+
+.vis[data-note]::after {
+  content: attr(data-note);
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 18px;
+  z-index: 3;
+  padding: 12px 14px;
+  color: #172026;
+  background: rgba(255, 255, 255, 0.94);
+  border-left: 4px solid var(--accent-2);
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 10px 24px rgba(24, 39, 46, 0.12);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
 .chart-note {
   margin: 0 0 34px;
   padding: 14px 18px;
@@ -214,6 +237,17 @@ footer a {
 
   .vis {
     padding: 12px;
+  }
+
+  .vis[data-note] {
+    padding-bottom: 92px;
+  }
+
+  .vis[data-note]::after {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    font-size: 0.86rem;
   }
 
   .footer-grid {

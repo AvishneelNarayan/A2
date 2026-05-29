@@ -814,7 +814,7 @@ def write_site():
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260529f">
+  <link rel="stylesheet" href="css/style.css?v=20260529g">
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -840,11 +840,11 @@ def write_site():
       <h2>Start with the shape of the network</h2>
       <p>Train and tram lines create strong corridors, while bus services spread access across far more suburbs. The first two maps show the difference between route structure and stop-level access.</p>
       <p>Each area in this analysis is an SA2, or Statistical Area Level 2: a small Australian Bureau of Statistics geography designed to represent local communities and suburbs. Using SA2s makes it possible to compare transport access across Greater Melbourne consistently.</p>
-      <div id="network_map" class="vis large"></div>
+      <div id="network_map" class="vis large" data-note="Rail and tram routes form strong radial corridors into the inner city."></div>
       <p class="chart-note">The network map shows that rail and tram infrastructure is concentrated around strong radial corridors, while many outer areas depend on lighter, more dispersed route coverage.</p>
-      <div id="stop_point_map" class="vis large"></div>
+      <div id="stop_point_map" class="vis large" data-note="Bus stops fill many of the gaps between train and tram corridors."></div>
       <p class="chart-note">At stop level, the picture becomes denser: buses fill many of the gaps between fixed rail corridors, making them central to everyday suburban coverage.</p>
-      <div id="mode_counts_bar" class="vis"></div>
+      <div id="mode_counts_bar" class="vis" data-note="Bus stops make up the largest share of Melbourne's stop network."></div>
       <p class="chart-note">The mode count comparison confirms this imbalance: bus stops dominate the network by volume, even though trains and trams often shape how people imagine Melbourne's public transport system.</p>
     </section>
 
@@ -852,9 +852,9 @@ def write_site():
       <p class="section-kicker">2. Stop locations</p>
       <h2>Stop density reveals the inner-city advantage</h2>
       <p>Counting stops by area highlights where public transport is physically close together. This favours compact inner SA2s, so it should be read as a spatial intensity measure rather than a complete accessibility score.</p>
-      <div id="stop_density_choropleth" class="vis large"></div>
+      <div id="stop_density_choropleth" class="vis large" data-note="Dense inner SA2s stand out because many stops fit into small areas."></div>
       <p class="chart-note">The highest stop density appears in compact inner and middle suburbs, where many stops are packed into a small area and walking distances between services are shorter.</p>
-      <div id="mode_small_multiples" class="vis large"></div>
+      <div id="mode_small_multiples" class="vis large" data-note="Bus coverage is widespread; train and tram access is more corridor-based."></div>
       <p class="chart-note">Splitting the map by mode shows why density alone is not enough: bus coverage spreads widely, while train and tram stops create more selective corridors of higher-capacity access.</p>
     </section>
 
@@ -862,11 +862,11 @@ def write_site():
       <p class="section-kicker">3. Mode distribution</p>
       <h2>Having stops is not the same as having choices</h2>
       <p>Some areas have many stops but mostly one mode. Others have fewer stops but benefit from a stronger mode mix, especially where train or tram services sit close to buses.</p>
-      <div id="mode_mix_stacked_bar" class="vis"></div>
+      <div id="mode_mix_stacked_bar" class="vis" data-note="High stop totals often still depend heavily on one dominant mode."></div>
       <p class="chart-note">The stacked bars highlight that high stop totals can hide dependence on one mode, especially where bus stops make up most of the local network.</p>
-      <div id="mode_coverage_dotplot" class="vis"></div>
+      <div id="mode_coverage_dotplot" class="vis" data-note="More mode options mean more flexible access for residents."></div>
       <p class="chart-note">The coverage dot plot makes mode choice clearer: areas with multiple modes have more resilient access than places served almost entirely by a single transport type.</p>
-      <div id="hourly_service_heatmap" class="vis"></div>
+      <div id="hourly_service_heatmap" class="vis" data-note="Service starts build through the morning and remain strong into the evening peak."></div>
       <p class="chart-note">Service timing adds another layer to access, with activity clustering around the day peaks and showing that the usefulness of a stop also depends on when services run.</p>
     </section>
 
@@ -874,9 +874,9 @@ def write_site():
       <p class="section-kicker">4. Population vs access</p>
       <h2>High population does not guarantee high stop supply</h2>
       <p>Normalising by population changes the picture. A suburb can look well supplied in raw stop counts but less generous once the number of residents is considered.</p>
-      <div id="population_access_choropleth" class="vis large"></div>
+      <div id="population_access_choropleth" class="vis large" data-note="Per-resident access changes the story by accounting for population pressure."></div>
       <p class="chart-note">When stops are compared against population, some low-population areas stand out strongly, while larger residential areas can look less well supplied per resident.</p>
-      <div id="population_vs_stops_scatter" class="vis"></div>
+      <div id="population_vs_stops_scatter" class="vis" data-note="Some high-population SA2s sit below the main pattern, showing weaker stop supply."></div>
       <p class="chart-note">The scatterplot reinforces the mismatch: population and stop supply increase together only loosely, so high demand does not always align neatly with high stop provision.</p>
     </section>
 
@@ -884,9 +884,9 @@ def write_site():
       <p class="section-kicker">5. Final access score</p>
       <h2>A simple score brings the signals together</h2>
       <p>The final score combines stops per resident, stops per square kilometre, mode diversity, and rail/tram availability. It is not an official measure, but it helps compare areas consistently and makes the trade-offs visible.</p>
-      <div id="ranked_access_bar" class="vis"></div>
+      <div id="ranked_access_bar" class="vis" data-note="The top and bottom SA2s show the clearest contrast in overall access."></div>
       <p class="chart-note">The ranked bars identify the clearest extremes, separating areas where multiple access signals stack up from those where the network appears thinner.</p>
-      <div id="access_score_choropleth" class="vis large"></div>
+      <div id="access_score_choropleth" class="vis large" data-note="Higher access clusters around the inner transport core; weaker scores appear more often near the fringe."></div>
       <p class="chart-note">The final map brings the story back to geography: stronger access clusters around the denser transport core, while outer areas show where distance, lower density, and fewer mode choices combine.</p>
     </section>
   </main>
@@ -1068,6 +1068,29 @@ h2 {
   height: auto;
 }
 
+.vis[data-note] {
+  padding-bottom: 78px;
+}
+
+.vis[data-note]::after {
+  content: attr(data-note);
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 18px;
+  z-index: 3;
+  padding: 12px 14px;
+  color: #172026;
+  background: rgba(255, 255, 255, 0.94);
+  border-left: 4px solid var(--accent-2);
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 10px 24px rgba(24, 39, 46, 0.12);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
 .chart-note {
   margin: 0 0 34px;
   padding: 14px 18px;
@@ -1129,6 +1152,17 @@ footer a {
 
   .vis {
     padding: 12px;
+  }
+
+  .vis[data-note] {
+    padding-bottom: 92px;
+  }
+
+  .vis[data-note]::after {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    font-size: 0.86rem;
   }
 
   .footer-grid {
