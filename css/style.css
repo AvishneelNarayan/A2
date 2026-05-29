@@ -153,66 +153,6 @@ h2 {
   height: auto;
 }
 
-.vis.is-zoomable {
-  padding-top: 58px;
-}
-
-.vis.is-zoomed {
-  overflow: hidden;
-}
-
-.map-viewport {
-  width: 100%;
-  overflow: hidden;
-  cursor: grab;
-  touch-action: none;
-}
-
-.map-viewport.is-panning {
-  cursor: grabbing;
-}
-
-.map-viewport .vega-embed {
-  transform-origin: 0 0;
-  will-change: transform;
-}
-
-.map-viewport .vega-embed > svg {
-  display: block;
-}
-
-.map-zoom-controls {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  z-index: 2;
-  display: flex;
-  gap: 6px;
-  padding: 4px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 8px 18px rgba(24, 39, 46, 0.08);
-}
-
-.map-zoom-controls button {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  background: #f5f7f8;
-  color: var(--panel-ink);
-  font: 700 0.92rem/1 Inter, Arial, sans-serif;
-  cursor: pointer;
-}
-
-.map-zoom-controls button:hover,
-.map-zoom-controls button:focus-visible {
-  border-color: var(--accent);
-  outline: none;
-}
-
 .chart-note {
   margin: 0 0 34px;
   padding: 14px 18px;
@@ -274,10 +214,6 @@ footer a {
 
   .vis {
     padding: 12px;
-  }
-
-  .vis.is-zoomable {
-    padding-top: 52px;
   }
 
   .footer-grid {

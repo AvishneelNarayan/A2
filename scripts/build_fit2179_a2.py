@@ -651,7 +651,7 @@ def write_site():
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260529e">
+  <link rel="stylesheet" href="css/style.css?v=20260529f">
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -745,7 +745,7 @@ def write_site():
       </section>
     </div>
   </footer>
-  <script src="js/main.js?v=20260529e"></script>
+  <script src="js/main.js?v=20260529f"></script>
 </body>
 </html>
 """
@@ -904,66 +904,6 @@ h2 {
   height: auto;
 }
 
-.vis.is-zoomable {
-  padding-top: 58px;
-}
-
-.vis.is-zoomed {
-  overflow: hidden;
-}
-
-.map-viewport {
-  width: 100%;
-  overflow: hidden;
-  cursor: grab;
-  touch-action: none;
-}
-
-.map-viewport.is-panning {
-  cursor: grabbing;
-}
-
-.map-viewport .vega-embed {
-  transform-origin: 0 0;
-  will-change: transform;
-}
-
-.map-viewport .vega-embed > svg {
-  display: block;
-}
-
-.map-zoom-controls {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  z-index: 2;
-  display: flex;
-  gap: 6px;
-  padding: 4px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 8px 18px rgba(24, 39, 46, 0.08);
-}
-
-.map-zoom-controls button {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  background: #f5f7f8;
-  color: var(--panel-ink);
-  font: 700 0.92rem/1 Inter, Arial, sans-serif;
-  cursor: pointer;
-}
-
-.map-zoom-controls button:hover,
-.map-zoom-controls button:focus-visible {
-  border-color: var(--accent);
-  outline: none;
-}
-
 .chart-note {
   margin: 0 0 34px;
   padding: 14px 18px;
@@ -1027,28 +967,24 @@ footer a {
     padding: 12px;
   }
 
-  .vis.is-zoomable {
-    padding-top: 52px;
-  }
-
   .footer-grid {
     grid-template-columns: 1fr;
   }
 }
 """
     main_js = """const charts = [
-  ["#network_map", "js/vega/01_network_map.json?v=20260522c", true],
-  ["#stop_point_map", "js/vega/02_stop_point_map.json?v=20260522c", true],
-  ["#mode_counts_bar", "js/vega/03_mode_counts_bar.json?v=20260522c", false],
-  ["#stop_density_choropleth", "js/vega/04_stop_density_choropleth.json?v=20260529b", true],
-  ["#mode_small_multiples", "js/vega/05_mode_small_multiples.json?v=20260529b", true],
-  ["#mode_mix_stacked_bar", "js/vega/06_mode_mix_stacked_bar.json?v=20260522c", false],
-  ["#mode_coverage_dotplot", "js/vega/07_mode_coverage_dotplot.json?v=20260522c", false],
-  ["#population_access_choropleth", "js/vega/08_population_access_choropleth.json?v=20260529b", true],
-  ["#population_vs_stops_scatter", "js/vega/09_population_vs_stops_scatter.json?v=20260522c", false],
-  ["#ranked_access_bar", "js/vega/10_ranked_access_bar.json?v=20260522c", false],
-  ["#access_score_choropleth", "js/vega/11_access_score_choropleth.json?v=20260522c", true],
-  ["#hourly_service_heatmap", "js/vega/12_hourly_service_heatmap.json?v=20260522c", false]
+  ["#network_map", "js/vega/01_network_map.json?v=20260522c"],
+  ["#stop_point_map", "js/vega/02_stop_point_map.json?v=20260522c"],
+  ["#mode_counts_bar", "js/vega/03_mode_counts_bar.json?v=20260522c"],
+  ["#stop_density_choropleth", "js/vega/04_stop_density_choropleth.json?v=20260529b"],
+  ["#mode_small_multiples", "js/vega/05_mode_small_multiples.json?v=20260529b"],
+  ["#mode_mix_stacked_bar", "js/vega/06_mode_mix_stacked_bar.json?v=20260522c"],
+  ["#mode_coverage_dotplot", "js/vega/07_mode_coverage_dotplot.json?v=20260522c"],
+  ["#population_access_choropleth", "js/vega/08_population_access_choropleth.json?v=20260529b"],
+  ["#population_vs_stops_scatter", "js/vega/09_population_vs_stops_scatter.json?v=20260522c"],
+  ["#ranked_access_bar", "js/vega/10_ranked_access_bar.json?v=20260522c"],
+  ["#access_score_choropleth", "js/vega/11_access_score_choropleth.json?v=20260522c"],
+  ["#hourly_service_heatmap", "js/vega/12_hourly_service_heatmap.json?v=20260522c"]
 ];
 
 const embedOptions = {
@@ -1056,128 +992,8 @@ const embedOptions = {
   renderer: "svg"
 };
 
-function addMapZoom(container) {
-  container.classList.add("is-zoomable");
-  const embed = container.querySelector(".vega-embed");
-  if (!embed) return;
-
-  const viewport = document.createElement("div");
-  viewport.className = "map-viewport";
-  embed.parentNode.insertBefore(viewport, embed);
-  viewport.appendChild(embed);
-
-  const state = {
-    scale: 1,
-    x: 0,
-    y: 0,
-    isDragging: false,
-    startX: 0,
-    startY: 0,
-    originX: 0,
-    originY: 0
-  };
-
-  const controls = document.createElement("div");
-  controls.className = "map-zoom-controls";
-
-  const buttons = [
-    ["-", "Zoom out", () => zoomAtCenter(0.82)],
-    ["1x", "Reset zoom", resetZoom],
-    ["+", "Zoom in", () => zoomAtCenter(1.22)]
-  ];
-
-  buttons.forEach(([label, title, handler]) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = label;
-    button.title = title;
-    button.setAttribute("aria-label", title);
-    button.addEventListener("click", handler);
-    controls.appendChild(button);
-  });
-
-  container.prepend(controls);
-
-  function applyZoom() {
-    embed.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
-    container.classList.toggle("is-zoomed", state.scale > 1);
-  }
-
-  function zoomAround(clientX, clientY, factor) {
-    const rect = viewport.getBoundingClientRect();
-    const nextScale = Math.min(4, Math.max(1, state.scale * factor));
-    const scaleRatio = nextScale / state.scale;
-    const pointerX = clientX - rect.left;
-    const pointerY = clientY - rect.top;
-
-    state.x = pointerX - (pointerX - state.x) * scaleRatio;
-    state.y = pointerY - (pointerY - state.y) * scaleRatio;
-    state.scale = nextScale;
-
-    if (state.scale === 1) {
-      state.x = 0;
-      state.y = 0;
-    }
-
-    applyZoom();
-  }
-
-  function zoomAtCenter(factor) {
-    const rect = viewport.getBoundingClientRect();
-    zoomAround(rect.left + rect.width / 2, rect.top + rect.height / 2, factor);
-  }
-
-  function resetZoom() {
-    state.scale = 1;
-    state.x = 0;
-    state.y = 0;
-    applyZoom();
-  }
-
-  viewport.addEventListener("wheel", (event) => {
-    event.preventDefault();
-    zoomAround(event.clientX, event.clientY, event.deltaY < 0 ? 1.14 : 0.88);
-  }, { passive: false });
-
-  viewport.addEventListener("pointerdown", (event) => {
-    if (state.scale <= 1) return;
-    state.isDragging = true;
-    state.startX = event.clientX;
-    state.startY = event.clientY;
-    state.originX = state.x;
-    state.originY = state.y;
-    viewport.classList.add("is-panning");
-    viewport.setPointerCapture(event.pointerId);
-  });
-
-  viewport.addEventListener("pointermove", (event) => {
-    if (!state.isDragging) return;
-    state.x = state.originX + event.clientX - state.startX;
-    state.y = state.originY + event.clientY - state.startY;
-    applyZoom();
-  });
-
-  viewport.addEventListener("pointerup", (event) => {
-    state.isDragging = false;
-    viewport.classList.remove("is-panning");
-    viewport.releasePointerCapture(event.pointerId);
-  });
-
-  viewport.addEventListener("pointercancel", () => {
-    state.isDragging = false;
-    viewport.classList.remove("is-panning");
-  });
-
-  applyZoom();
-}
-
-charts.forEach(([target, spec, zoomable]) => {
-  vegaEmbed(target, spec, embedOptions).then(() => {
-    const el = document.querySelector(target);
-    if (el && zoomable) {
-      addMapZoom(el);
-    }
-  }).catch((error) => {
+charts.forEach(([target, spec]) => {
+  vegaEmbed(target, spec, embedOptions).catch((error) => {
     const el = document.querySelector(target);
     if (el) {
       el.innerHTML = `<p class="error">This visualisation could not load: ${error.message}</p>`;
