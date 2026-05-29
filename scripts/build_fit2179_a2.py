@@ -716,9 +716,22 @@ def write_site():
   </main>
 
   <footer>
-    <p><strong>Author:</strong> Student name | <strong>Unit:</strong> FIT2179 Data Visualisation | <strong>Date:</strong> May 2026</p>
-    <p><strong>Sources:</strong> Public Transport Victoria GTFS and public transport spatial data; Australian Bureau of Statistics Regional population 2024-25; ABS ASGS Edition 3 SA2 boundaries.</p>
-    <p><strong>AI acknowledgement:</strong> Generative AI assistance was used to help structure code, process data, and refine written explanations. Final design decisions and submitted work should be reviewed by the author.</p>
+    <div class="footer-grid">
+      <section>
+        <h2>AI Declaration</h2>
+        <p>AI was used in this project to write python helper functions fro data processing and for streamlining some parts of the website code</p>
+      </section>
+      <section>
+        <h2>References</h2>
+        <ul class="references">
+          <li><a href="https://opendata.transport.vic.gov.au/dataset/gtfs-schedule">Transport Victoria Open Data, GTFS Schedule</a> - static timetable, route, stop, trip, shape and service data.</li>
+          <li><a href="https://discover.data.vic.gov.au/dataset/public-transport-lines-and-stops">Victorian Government DataVic, Public Transport Lines and Stops</a> - public transport stop and line GeoJSON spatial data.</li>
+          <li><a href="https://www.abs.gov.au/statistics/people/population/regional-population/2024-25">Australian Bureau of Statistics, Regional population 2024-25</a> - SA2 estimated resident population data.</li>
+          <li><a href="https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files">Australian Bureau of Statistics, ASGS Edition 3 digital boundary files</a> - 2021 SA2 boundary shapefile and area fields.</li>
+          <li><a href="https://commons.wikimedia.org/wiki/File:A_class_tram_257_in_PTV_livery_operating_a_Route_12_service_to_St_Kilda_-_Fitzroy_Street_on_Macarthur_Street_crossing_Spring_Street_into_Collins_Street,_Melbourne.jpg">Hero image by Philip Mallis via Wikimedia Commons</a>, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>.</li>
+        </ul>
+      </section>
+    </div>
   </footer>
   <script src="js/main.js"></script>
 </body>
@@ -747,9 +760,9 @@ body {
 }
 
 .hero {
-  background: linear-gradient(120deg, rgba(12, 36, 55, 0.78), rgba(20, 96, 103, 0.58)), url("../assets/hero_ptv_transport.png");
+  background: linear-gradient(120deg, rgba(12, 36, 55, 0.78), rgba(20, 96, 103, 0.58)), url("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/A_class_tram_257_in_PTV_livery_operating_a_Route_12_service_to_St_Kilda_-_Fitzroy_Street_on_Macarthur_Street_crossing_Spring_Street_into_Collins_Street%2C_Melbourne.jpg/1280px-A_class_tram_257_in_PTV_livery_operating_a_Route_12_service_to_St_Kilda_-_Fitzroy_Street_on_Macarthur_Street_crossing_Spring_Street_into_Collins_Street%2C_Melbourne.jpg");
   background-size: cover;
-  background-position: center;
+  background-position: center 42%;
   color: #fff;
   min-height: 82vh;
   display: flex;
@@ -899,6 +912,33 @@ footer p {
   margin: 0 0 10px;
 }
 
+footer h2 {
+  margin: 0 0 14px;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 30px;
+  padding-top: 18px;
+}
+
+.references {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.references li {
+  margin: 0 0 9px;
+}
+
+footer a {
+  color: var(--accent);
+}
+
 @media (max-width: 760px) {
   .hero {
     min-height: 92vh;
@@ -914,6 +954,10 @@ footer p {
 
   .vis {
     padding: 12px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
   }
 }
 """
