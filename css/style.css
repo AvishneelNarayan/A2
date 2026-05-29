@@ -23,7 +23,9 @@ body {
 }
 
 .hero {
-  background: linear-gradient(120deg, rgba(12, 36, 55, 0.78), rgba(20, 96, 103, 0.58)), url("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/A_class_tram_257_in_PTV_livery_operating_a_Route_12_service_to_St_Kilda_-_Fitzroy_Street_on_Macarthur_Street_crossing_Spring_Street_into_Collins_Street%2C_Melbourne.jpg/1280px-A_class_tram_257_in_PTV_livery_operating_a_Route_12_service_to_St_Kilda_-_Fitzroy_Street_on_Macarthur_Street_crossing_Spring_Street_into_Collins_Street%2C_Melbourne.jpg");
+  background:
+    linear-gradient(120deg, rgba(12, 36, 55, 0.78), rgba(20, 96, 103, 0.58)),
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/A_class_tram_257_in_PTV_livery_operating_a_Route_12_service_to_St_Kilda_-_Fitzroy_Street_on_Macarthur_Street_crossing_Spring_Street_into_Collins_Street%2C_Melbourne.jpg/1280px-A_class_tram_257_in_PTV_livery_operating_a_Route_12_service_to_St_Kilda_-_Fitzroy_Street_on_Macarthur_Street_crossing_Spring_Street_into_Collins_Street%2C_Melbourne.jpg");
   background-size: cover;
   background-position: center 42%;
   color: #fff;
@@ -148,7 +150,7 @@ h2 {
   width: 100%;
 }
 
-.vega-embed > svg {
+.vega-embed>svg {
   max-width: 100%;
   height: auto;
 }

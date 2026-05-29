@@ -1,112 +1,297 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Public Transport Accessibility Across Melbourne</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260529g">
-  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-</head>
-<body>
-  <header class="hero">
-    <div class="hero__inner">
-      <p class="eyebrow">FIT2179 Data Visualisation 2</p>
-      <h1>Public Transport Accessibility Across Melbourne</h1>
-      <p class="byline">By Avishneel Sagar Narayan</p>
-      <p class="lede">Melbourne's public transport network is dense in some places and thin in others. This data story compares stops, modes, population and area to ask a simple question: where does access look strongest, and where might residents need more attention?</p>
-      <div class="hero__stats">
-        <div><strong>2025</strong><span>ABS population year</span></div>
-        <div><strong>Greater Melbourne</strong><span>SA2 analysis area</span></div>
-        <div><strong>14</strong><span>Vega-Lite views</span></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Public Transport Accessibility Across Melbourne</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css?v=20260529g" />
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__inner">
+        <p class="eyebrow">FIT2179 Data Visualisation 2</p>
+        <h1>Public Transport Accessibility Across Melbourne</h1>
+        <p class="byline">By Avishneel Sagar Narayan</p>
+        <p class="lede">
+          Melbourne's public transport network is dense in some places and thin
+          in others. This data story compares stops, modes, population and area
+          to ask a simple question: where does access look strongest, and where
+          might residents need more attention?
+        </p>
+        <div class="hero__stats">
+          <div><strong>2025</strong><span>ABS population year</span></div>
+          <div>
+            <strong>Greater Melbourne</strong><span>SA2 analysis area</span>
+          </div>
+          <div><strong>14</strong><span>Vega-Lite views</span></div>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main>
-    <section class="story-section">
-      <p class="section-kicker">1. Introduction</p>
-      <h2>Start with the shape of the network</h2>
-      <p>Train and tram lines create strong corridors, while bus services spread access across far more suburbs. The first two maps show the difference between route structure and stop-level access.</p>
-      <p>Each area in this analysis is an SA2, or Statistical Area Level 2: a small Australian Bureau of Statistics geography designed to represent local communities and suburbs. Using SA2s makes it possible to compare transport access across Greater Melbourne consistently.</p>
-      <div id="network_map" class="vis large" data-note="Rail and tram routes form strong radial corridors into the inner city."></div>
-      <p class="chart-note">The network map shows that rail and tram infrastructure is concentrated around strong radial corridors, while many outer areas depend on lighter, more dispersed route coverage.</p>
-      <div id="stop_point_map" class="vis large" data-note="Bus stops fill many of the gaps between train and tram corridors."></div>
-      <p class="chart-note">At stop level, the picture becomes denser: buses fill many of the gaps between fixed rail corridors, making them central to everyday suburban coverage.</p>
-      <div id="mode_counts_bar" class="vis" data-note="Bus stops make up the largest share of Melbourne's stop network."></div>
-      <p class="chart-note">The mode count comparison confirms this imbalance: bus stops dominate the network by volume, even though trains and trams often shape how people imagine Melbourne's public transport system.</p>
-    </section>
-
-    <section class="story-section">
-      <p class="section-kicker">2. Stop locations</p>
-      <h2>Stop density reveals the inner-city advantage</h2>
-      <p>Counting stops by area highlights where public transport is physically close together. This favours compact inner SA2s, so it should be read as a spatial intensity measure rather than a complete accessibility score.</p>
-      <div id="stop_density_choropleth" class="vis large" data-note="Dense inner SA2s stand out because many stops fit into small areas."></div>
-      <p class="chart-note">The highest stop density appears in compact inner and middle suburbs, where many stops are packed into a small area and walking distances between services are shorter.</p>
-      <div id="mode_small_multiples" class="vis large" data-note="Bus coverage is widespread; train and tram access is more corridor-based."></div>
-      <p class="chart-note">Splitting the map by mode shows why density alone is not enough: bus coverage spreads widely, while train and tram stops create more selective corridors of higher-capacity access.</p>
-    </section>
-
-    <section class="story-section">
-      <p class="section-kicker">3. Mode distribution</p>
-      <h2>Having stops is not the same as having choices</h2>
-      <p>Some areas have many stops but mostly one mode. Others have fewer stops but benefit from a stronger mode mix, especially where train or tram services sit close to buses.</p>
-      <div id="mode_diversity_choropleth" class="vis large" data-note="Mode diversity highlights where residents have real choice, not just lots of stops."></div>
-      <p class="chart-note">Mapping the number of available modes shows that many suburbs are bus-only, while the strongest choice tends to appear where buses overlap with train or tram access.</p>
-      <div id="mode_mix_stacked_bar" class="vis" data-note="High stop totals often still depend heavily on one dominant mode."></div>
-      <p class="chart-note">The stacked bars highlight that high stop totals can hide dependence on one mode, especially where bus stops make up most of the local network.</p>
-      <div id="mode_coverage_dotplot" class="vis" data-note="More mode options mean more flexible access for residents."></div>
-      <p class="chart-note">The coverage dot plot makes mode choice clearer: areas with multiple modes have more resilient access than places served almost entirely by a single transport type.</p>
-      <div id="hourly_service_heatmap" class="vis" data-note="Service starts build through the morning and remain strong into the evening peak."></div>
-      <p class="chart-note">Service timing adds another layer to access, with activity clustering around the day peaks and showing that the usefulness of a stop also depends on when services run.</p>
-    </section>
-
-    <section class="story-section">
-      <p class="section-kicker">4. Population vs access</p>
-      <h2>High population does not guarantee high stop supply</h2>
-      <p>Normalising by population changes the picture. A suburb can look well supplied in raw stop counts but less generous once the number of residents is considered.</p>
-      <div id="population_access_choropleth" class="vis large" data-note="Per-resident access changes the story by accounting for population pressure."></div>
-      <p class="chart-note">When stops are compared against population, some low-population areas stand out strongly, while larger residential areas can look less well supplied per resident.</p>
-      <div id="underserved_high_population_bar" class="vis" data-note="These high-population SA2s have the lowest stop supply per resident."></div>
-      <p class="chart-note">Ranking only high-population SA2s draws attention to places where many residents share a comparatively small stop supply.</p>
-      <div id="population_vs_stops_scatter" class="vis" data-note="Some high-population SA2s sit below the main pattern, showing weaker stop supply."></div>
-      <p class="chart-note">The scatterplot reinforces the mismatch: population and stop supply increase together only loosely, so high demand does not always align neatly with high stop provision.</p>
-    </section>
-
-    <section class="story-section">
-      <p class="section-kicker">5. Final access score</p>
-      <h2>A simple score brings the signals together</h2>
-      <p>The final score combines stops per resident, stops per square kilometre, mode diversity, and rail/tram availability. It is not an official measure, but it helps compare areas consistently and makes the trade-offs visible.</p>
-      <div id="ranked_access_bar" class="vis" data-note="The top and bottom SA2s show the clearest contrast in overall access."></div>
-      <p class="chart-note">The ranked bars identify the clearest extremes, separating areas where multiple access signals stack up from those where the network appears thinner.</p>
-      <div id="access_score_choropleth" class="vis large" data-note="Higher access clusters around the inner transport core; weaker scores appear more often near the fringe."></div>
-      <p class="chart-note">The final map brings the story back to geography: stronger access clusters around the denser transport core, while outer areas show where distance, lower density, and fewer mode choices combine.</p>
-    </section>
-  </main>
-
-  <footer>
-    <div class="footer-grid">
-      <section>
-        <h2>AI Declaration</h2>
-        <p>AI was used in this project to write python helper functions fro data processing and for streamlining some parts of the website code</p>
+    <main>
+      <section class="story-section">
+        <p class="section-kicker">1. Introduction</p>
+        <h2>Start with the shape of the network</h2>
+        <p>
+          Train and tram lines create strong corridors, while bus services
+          spread access across far more suburbs. The first two maps show the
+          difference between route structure and stop-level access.
+        </p>
+        <p>
+          Each area in this analysis is an SA2, or Statistical Area Level 2: a
+          small Australian Bureau of Statistics geography designed to represent
+          local communities and suburbs. Using SA2s makes it possible to compare
+          transport access across Greater Melbourne consistently.
+        </p>
+        <div
+          id="network_map"
+          class="vis large"
+          data-note="Rail and tram routes form strong radial corridors into the inner city."
+        ></div>
+        <p class="chart-note">
+          The network map shows that rail and tram infrastructure is
+          concentrated around strong radial corridors, while many outer areas
+          depend on lighter, more dispersed route coverage.
+        </p>
+        <div
+          id="stop_point_map"
+          class="vis large"
+          data-note="Bus stops fill many of the gaps between train and tram corridors."
+        ></div>
+        <p class="chart-note">
+          At stop level, the picture becomes denser: buses fill many of the gaps
+          between fixed rail corridors, making them central to everyday suburban
+          coverage.
+        </p>
+        <div
+          id="mode_counts_bar"
+          class="vis"
+          data-note="Bus stops make up the largest share of Melbourne's stop network."
+        ></div>
+        <p class="chart-note">
+          The mode count comparison confirms this imbalance: bus stops dominate
+          the network by volume, even though trains and trams often shape how
+          people imagine Melbourne's public transport system.
+        </p>
       </section>
-      <section>
-        <h2>References</h2>
-        <ul class="references">
-          <li><a href="https://opendata.transport.vic.gov.au/dataset/gtfs-schedule">Transport Victoria Open Data, GTFS Schedule</a> - static timetable, route, stop, trip, shape and service data.</li>
-          <li><a href="https://discover.data.vic.gov.au/dataset/public-transport-lines-and-stops">Victorian Government DataVic, Public Transport Lines and Stops</a> - public transport stop and line GeoJSON spatial data.</li>
-          <li><a href="https://www.abs.gov.au/statistics/people/population/regional-population/2024-25">Australian Bureau of Statistics, Regional population 2024-25</a> - SA2 estimated resident population data.</li>
-          <li><a href="https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files">Australian Bureau of Statistics, ASGS Edition 3 digital boundary files</a> - 2021 SA2 boundary shapefile and area fields.</li>
-          <li><a href="https://commons.wikimedia.org/wiki/File:A_class_tram_257_in_PTV_livery_operating_a_Route_12_service_to_St_Kilda_-_Fitzroy_Street_on_Macarthur_Street_crossing_Spring_Street_into_Collins_Street,_Melbourne.jpg">Hero image by Philip Mallis via Wikimedia Commons</a>, licensed under <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>.</li>
-        </ul>
-      </section>
-    </div>
-  </footer>
 
-  <script src="js/main.js?v=20260529f"></script>
-</body>
+      <section class="story-section">
+        <p class="section-kicker">2. Stop locations</p>
+        <h2>Stop density reveals the inner-city advantage</h2>
+        <p>
+          Counting stops by area highlights where public transport is physically
+          close together. This favours compact inner SA2s, so it should be read
+          as a spatial intensity measure rather than a complete accessibility
+          score.
+        </p>
+        <div
+          id="stop_density_choropleth"
+          class="vis large"
+          data-note="Dense inner SA2s stand out because many stops fit into small areas."
+        ></div>
+        <p class="chart-note">
+          The highest stop density appears in compact inner and middle suburbs,
+          where many stops are packed into a small area and walking distances
+          between services are shorter.
+        </p>
+        <div
+          id="mode_small_multiples"
+          class="vis large"
+          data-note="Bus coverage is widespread; train and tram access is more corridor-based."
+        ></div>
+        <p class="chart-note">
+          Splitting the map by mode shows why density alone is not enough: bus
+          coverage spreads widely, while train and tram stops create more
+          selective corridors of higher-capacity access.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <p class="section-kicker">3. Mode distribution</p>
+        <h2>Having stops is not the same as having choices</h2>
+        <p>
+          Some areas have many stops but mostly one mode. Others have fewer
+          stops but benefit from a stronger mode mix, especially where train or
+          tram services sit close to buses.
+        </p>
+        <div
+          id="mode_diversity_choropleth"
+          class="vis large"
+          data-note="Mode diversity highlights where residents have real choice, not just lots of stops."
+        ></div>
+        <p class="chart-note">
+          Mapping the number of available modes shows that many suburbs are
+          bus-only, while the strongest choice tends to appear where buses
+          overlap with train or tram access.
+        </p>
+        <div
+          id="mode_mix_stacked_bar"
+          class="vis"
+          data-note="High stop totals often still depend heavily on one dominant mode."
+        ></div>
+        <p class="chart-note">
+          The stacked bars highlight that high stop totals can hide dependence
+          on one mode, especially where bus stops make up most of the local
+          network.
+        </p>
+        <div
+          id="mode_coverage_dotplot"
+          class="vis"
+          data-note="More mode options mean more flexible access for residents."
+        ></div>
+        <p class="chart-note">
+          The coverage dot plot makes mode choice clearer: areas with multiple
+          modes have more resilient access than places served almost entirely by
+          a single transport type.
+        </p>
+        <div
+          id="hourly_service_heatmap"
+          class="vis"
+          data-note="Service starts build through the morning and remain strong into the evening peak."
+        ></div>
+        <p class="chart-note">
+          Service timing adds another layer to access, with activity clustering
+          around the day peaks and showing that the usefulness of a stop also
+          depends on when services run.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <p class="section-kicker">4. Population vs access</p>
+        <h2>High population does not guarantee high stop supply</h2>
+        <p>
+          Normalising by population changes the picture. A suburb can look well
+          supplied in raw stop counts but less generous once the number of
+          residents is considered.
+        </p>
+        <div
+          id="population_access_choropleth"
+          class="vis large"
+          data-note="Per-resident access changes the story by accounting for population pressure."
+        ></div>
+        <p class="chart-note">
+          When stops are compared against population, some low-population areas
+          stand out strongly, while larger residential areas can look less well
+          supplied per resident.
+        </p>
+        <div
+          id="underserved_high_population_bar"
+          class="vis"
+          data-note="These high-population SA2s have the lowest stop supply per resident."
+        ></div>
+        <p class="chart-note">
+          Ranking only high-population SA2s draws attention to places where many
+          residents share a comparatively small stop supply.
+        </p>
+        <div
+          id="population_vs_stops_scatter"
+          class="vis"
+          data-note="Some high-population SA2s sit below the main pattern, showing weaker stop supply."
+        ></div>
+        <p class="chart-note">
+          The scatterplot reinforces the mismatch: population and stop supply
+          increase together only loosely, so high demand does not always align
+          neatly with high stop provision.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <p class="section-kicker">5. Final access score</p>
+        <h2>A simple score brings the signals together</h2>
+        <p>
+          The final score combines stops per resident, stops per square
+          kilometre, mode diversity, and rail/tram availability. It is not an
+          official measure, but it helps compare areas consistently and makes
+          the trade-offs visible.
+        </p>
+        <div
+          id="ranked_access_bar"
+          class="vis"
+          data-note="The top and bottom SA2s show the clearest contrast in overall access."
+        ></div>
+        <p class="chart-note">
+          The ranked bars identify the clearest extremes, separating areas where
+          multiple access signals stack up from those where the network appears
+          thinner.
+        </p>
+        <div
+          id="access_score_choropleth"
+          class="vis large"
+          data-note="Higher access clusters around the inner transport core; weaker scores appear more often near the fringe."
+        ></div>
+        <p class="chart-note">
+          The final map brings the story back to geography: stronger access
+          clusters around the denser transport core, while outer areas show
+          where distance, lower density, and fewer mode choices combine.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-grid">
+        <section>
+          <h2>AI Declaration</h2>
+          <p>
+            AI was used in this project to write python helper functions fro
+            data processing and for streamlining some parts of the website code
+          </p>
+        </section>
+        <section>
+          <h2>References</h2>
+          <ul class="references">
+            <li>
+              <a
+                href="https://opendata.transport.vic.gov.au/dataset/gtfs-schedule"
+                >Transport Victoria Open Data, GTFS Schedule</a
+              >
+              - static timetable, route, stop, trip, shape and service data.
+            </li>
+            <li>
+              <a
+                href="https://discover.data.vic.gov.au/dataset/public-transport-lines-and-stops"
+                >Victorian Government DataVic, Public Transport Lines and
+                Stops</a
+              >
+              - public transport stop and line GeoJSON spatial data.
+            </li>
+            <li>
+              <a
+                href="https://www.abs.gov.au/statistics/people/population/regional-population/2024-25"
+                >Australian Bureau of Statistics, Regional population 2024-25</a
+              >
+              - SA2 estimated resident population data.
+            </li>
+            <li>
+              <a
+                href="https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files"
+                >Australian Bureau of Statistics, ASGS Edition 3 digital
+                boundary files</a
+              >
+              - 2021 SA2 boundary shapefile and area fields.
+            </li>
+            <li>
+              <a
+                href="https://commons.wikimedia.org/wiki/File:A_class_tram_257_in_PTV_livery_operating_a_Route_12_service_to_St_Kilda_-_Fitzroy_Street_on_Macarthur_Street_crossing_Spring_Street_into_Collins_Street,_Melbourne.jpg"
+                >Hero image by Philip Mallis via Wikimedia Commons</a
+              >, licensed under
+              <a href="https://creativecommons.org/licenses/by-sa/2.0/"
+                >CC BY-SA 2.0</a
+              >.
+            </li>
+          </ul>
+        </section>
+      </div>
+    </footer>
+
+    <script src="js/main.js?v=20260529f"></script>
+  </body>
 </html>

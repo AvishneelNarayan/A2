@@ -43,13 +43,7 @@
       "type": "quantitative",
       "scale": {
         "type": "threshold",
-        "domain": [
-          5,
-          10,
-          15,
-          25,
-          40
-        ],
+        "domain": [5, 10, 15, 25, 40],
         "range": [
           "#e7f4d5",
           "#b8e3c4",

@@ -42,18 +42,8 @@
       "field": "properties.mode_diversity",
       "type": "ordinal",
       "scale": {
-        "domain": [
-          1,
-          2,
-          3,
-          4
-        ],
-        "range": [
-          "#f1eef6",
-          "#bdc9e1",
-          "#74a9cf",
-          "#0570b0"
-        ]
+        "domain": [1, 2, 3, 4],
+        "range": ["#f1eef6", "#bdc9e1", "#74a9cf", "#0570b0"]
       },
       "title": "Modes available"
     },
