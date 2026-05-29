@@ -30,8 +30,8 @@
     "title": null
   },
         "spec": {
-            "width": 330,
-            "height": 360,
+            "width": 240,
+            "height": 320,
     "projection": {
       "type": "mercator"
     },

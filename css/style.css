@@ -126,6 +126,7 @@ h2 {
 }
 
 .vis {
+  position: relative;
   width: 100%;
   margin: 28px 0;
   padding: 22px;
@@ -140,20 +141,6 @@ h2 {
   min-height: 460px;
 }
 
-.scrollable-vis {
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.scrollable-vis .vega-embed {
-  min-width: 1500px;
-}
-
-.scrollable-vis svg {
-  max-width: none;
-  min-width: 1500px;
-}
-
 .vega-embed {
   width: 100%;
 }
@@ -161,6 +148,55 @@ h2 {
 .vega-embed > svg {
   max-width: 100%;
   height: auto;
+}
+
+.vis.is-zoomable {
+  padding-top: 58px;
+}
+
+.vis.is-zoomed {
+  overflow: auto;
+}
+
+.vis.is-zoomable .vega-embed {
+  transition: width 160ms ease;
+}
+
+.vis.is-zoomable .vega-embed > svg {
+  width: 100%;
+  max-width: none;
+}
+
+.map-zoom-controls {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(24, 39, 46, 0.08);
+}
+
+.map-zoom-controls button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #f5f7f8;
+  color: var(--ink);
+  font: 700 0.92rem/1 Inter, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.map-zoom-controls button:hover,
+.map-zoom-controls button:focus-visible {
+  border-color: var(--accent);
+  outline: none;
 }
 
 footer {
@@ -215,6 +251,10 @@ footer a {
 
   .vis {
     padding: 12px;
+  }
+
+  .vis.is-zoomable {
+    padding-top: 52px;
   }
 
   .footer-grid {

@@ -535,8 +535,8 @@ def write_specs():
         "data": {"url": "data/processed/melbourne_stops.csv"},
         "facet": {"field": "mode", "type": "nominal", "columns": 4, "title": None},
         "spec": {
-            "width": 330,
-            "height": 360,
+            "width": 240,
+            "height": 320,
             "projection": {"type": "mercator"},
             "layer": [
                 {"data": {"url": "data/processed/melbourne_sa2.geojson", "format": {"type": "json", "property": "features"}}, "mark": {"type": "geoshape", "fill": "#f5f6f4", "stroke": "#d8dedb", "strokeWidth": 0.25}},
@@ -651,7 +651,7 @@ def write_site():
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260529a">
+  <link rel="stylesheet" href="css/style.css?v=20260529b">
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -686,7 +686,7 @@ def write_site():
       <h2>Stop density reveals the inner-city advantage</h2>
       <p>Counting stops by area highlights where public transport is physically close together. This favours compact inner SA2s, so it should be read as a spatial intensity measure rather than a complete accessibility score.</p>
       <div id="stop_density_choropleth" class="vis large"></div>
-      <div id="mode_small_multiples" class="vis large scrollable-vis"></div>
+      <div id="mode_small_multiples" class="vis large"></div>
     </section>
 
     <section class="story-section">
@@ -865,6 +865,7 @@ h2 {
 }
 
 .vis {
+  position: relative;
   width: 100%;
   margin: 28px 0;
   padding: 22px;
@@ -879,20 +880,6 @@ h2 {
   min-height: 460px;
 }
 
-.scrollable-vis {
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.scrollable-vis .vega-embed {
-  min-width: 1500px;
-}
-
-.scrollable-vis svg {
-  max-width: none;
-  min-width: 1500px;
-}
-
 .vega-embed {
   width: 100%;
 }
@@ -900,6 +887,55 @@ h2 {
 .vega-embed > svg {
   max-width: 100%;
   height: auto;
+}
+
+.vis.is-zoomable {
+  padding-top: 58px;
+}
+
+.vis.is-zoomed {
+  overflow: auto;
+}
+
+.vis.is-zoomable .vega-embed {
+  transition: width 160ms ease;
+}
+
+.vis.is-zoomable .vega-embed > svg {
+  width: 100%;
+  max-width: none;
+}
+
+.map-zoom-controls {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(24, 39, 46, 0.08);
+}
+
+.map-zoom-controls button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #f5f7f8;
+  color: var(--ink);
+  font: 700 0.92rem/1 Inter, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.map-zoom-controls button:hover,
+.map-zoom-controls button:focus-visible {
+  border-color: var(--accent);
+  outline: none;
 }
 
 footer {
@@ -956,24 +992,28 @@ footer a {
     padding: 12px;
   }
 
+  .vis.is-zoomable {
+    padding-top: 52px;
+  }
+
   .footer-grid {
     grid-template-columns: 1fr;
   }
 }
 """
     main_js = """const charts = [
-  ["#network_map", "js/vega/01_network_map.json?v=20260522c"],
-  ["#stop_point_map", "js/vega/02_stop_point_map.json?v=20260522c"],
-  ["#mode_counts_bar", "js/vega/03_mode_counts_bar.json?v=20260522c"],
-  ["#stop_density_choropleth", "js/vega/04_stop_density_choropleth.json?v=20260522c"],
-  ["#mode_small_multiples", "js/vega/05_mode_small_multiples.json?v=20260522d"],
-  ["#mode_mix_stacked_bar", "js/vega/06_mode_mix_stacked_bar.json?v=20260522c"],
-  ["#mode_coverage_dotplot", "js/vega/07_mode_coverage_dotplot.json?v=20260522c"],
-  ["#population_access_choropleth", "js/vega/08_population_access_choropleth.json?v=20260522c"],
-  ["#population_vs_stops_scatter", "js/vega/09_population_vs_stops_scatter.json?v=20260522c"],
-  ["#ranked_access_bar", "js/vega/10_ranked_access_bar.json?v=20260522c"],
-  ["#access_score_choropleth", "js/vega/11_access_score_choropleth.json?v=20260522c"],
-  ["#hourly_service_heatmap", "js/vega/12_hourly_service_heatmap.json?v=20260522c"]
+  ["#network_map", "js/vega/01_network_map.json?v=20260522c", true],
+  ["#stop_point_map", "js/vega/02_stop_point_map.json?v=20260522c", true],
+  ["#mode_counts_bar", "js/vega/03_mode_counts_bar.json?v=20260522c", false],
+  ["#stop_density_choropleth", "js/vega/04_stop_density_choropleth.json?v=20260529b", true],
+  ["#mode_small_multiples", "js/vega/05_mode_small_multiples.json?v=20260529b", true],
+  ["#mode_mix_stacked_bar", "js/vega/06_mode_mix_stacked_bar.json?v=20260522c", false],
+  ["#mode_coverage_dotplot", "js/vega/07_mode_coverage_dotplot.json?v=20260522c", false],
+  ["#population_access_choropleth", "js/vega/08_population_access_choropleth.json?v=20260529b", true],
+  ["#population_vs_stops_scatter", "js/vega/09_population_vs_stops_scatter.json?v=20260522c", false],
+  ["#ranked_access_bar", "js/vega/10_ranked_access_bar.json?v=20260522c", false],
+  ["#access_score_choropleth", "js/vega/11_access_score_choropleth.json?v=20260522c", true],
+  ["#hourly_service_heatmap", "js/vega/12_hourly_service_heatmap.json?v=20260522c", false]
 ];
 
 const embedOptions = {
@@ -981,8 +1021,48 @@ const embedOptions = {
   renderer: "svg"
 };
 
-charts.forEach(([target, spec]) => {
-  vegaEmbed(target, spec, embedOptions).catch((error) => {
+function addMapZoom(container) {
+  container.classList.add("is-zoomable");
+  let zoom = 1;
+  const controls = document.createElement("div");
+  controls.className = "map-zoom-controls";
+
+  const buttons = [
+    ["-", "Zoom out", () => setZoom(Math.max(0.8, zoom - 0.2))],
+    ["1x", "Reset zoom", () => setZoom(1)],
+    ["+", "Zoom in", () => setZoom(Math.min(2, zoom + 0.2))]
+  ];
+
+  buttons.forEach(([label, title, handler]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = label;
+    button.title = title;
+    button.setAttribute("aria-label", title);
+    button.addEventListener("click", handler);
+    controls.appendChild(button);
+  });
+
+  container.prepend(controls);
+
+  function setZoom(nextZoom) {
+    zoom = Number(nextZoom.toFixed(1));
+    const embed = container.querySelector(".vega-embed");
+    if (!embed) return;
+    embed.style.width = `${zoom * 100}%`;
+    container.classList.toggle("is-zoomed", zoom > 1);
+  }
+
+  setZoom(zoom);
+}
+
+charts.forEach(([target, spec, zoomable]) => {
+  vegaEmbed(target, spec, embedOptions).then(() => {
+    const el = document.querySelector(target);
+    if (el && zoomable) {
+      addMapZoom(el);
+    }
+  }).catch((error) => {
     const el = document.querySelector(target);
     if (el) {
       el.innerHTML = `<p class="error">This visualisation could not load: ${error.message}</p>`;
