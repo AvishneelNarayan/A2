@@ -42,6 +42,8 @@
       "field": "properties.stops_per_10000_residents",
       "type": "quantitative",
       "scale": {
+        "type": "symlog",
+        "constant": 10,
         "scheme": "yellowgreenblue"
       },
       "title": "Stops per 10,000 Residents"

@@ -526,8 +526,8 @@ def write_specs():
             ],
         },
     }
-    specs["04_stop_density_choropleth.json"] = choropleth_layer("stops_per_sqkm", "Stops per Square Kilometre", {"scheme": "tealblues"})
-    specs["08_population_access_choropleth.json"] = choropleth_layer("stops_per_10000_residents", "Stops per 10,000 Residents", {"scheme": "yellowgreenblue"})
+    specs["04_stop_density_choropleth.json"] = choropleth_layer("stops_per_sqkm", "Stops per Square Kilometre", {"type": "log", "nice": True, "scheme": "tealblues"})
+    specs["08_population_access_choropleth.json"] = choropleth_layer("stops_per_10000_residents", "Stops per 10,000 Residents", {"type": "symlog", "constant": 10, "scheme": "yellowgreenblue"})
     specs["11_access_score_choropleth.json"] = choropleth_layer("access_score", "Overall Public Transport Access Score", {"scheme": "viridis", "domain": [0, 100]})
 
     specs["05_mode_small_multiples.json"] = {

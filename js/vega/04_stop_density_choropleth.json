@@ -42,6 +42,8 @@
       "field": "properties.stops_per_sqkm",
       "type": "quantitative",
       "scale": {
+        "type": "log",
+        "nice": true,
         "scheme": "tealblues"
       },
       "title": "Stops per Square Kilometre"
