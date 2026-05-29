@@ -163,11 +163,10 @@ h2 {
 
 .vis.is-zoomable .vega-embed {
   display: block;
-  transform-origin: top left;
-  transition: transform 160ms ease, margin-bottom 160ms ease;
 }
 
 .vis.is-zoomable .vega-embed > svg {
+  display: block;
   max-width: none;
 }
 

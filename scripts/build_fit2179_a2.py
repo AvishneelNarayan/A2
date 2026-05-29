@@ -651,7 +651,7 @@ def write_site():
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260529c">
+  <link rel="stylesheet" href="css/style.css?v=20260529d">
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -745,7 +745,7 @@ def write_site():
       </section>
     </div>
   </footer>
-  <script src="js/main.js?v=20260529c"></script>
+  <script src="js/main.js?v=20260529d"></script>
 </body>
 </html>
 """
@@ -914,11 +914,10 @@ h2 {
 
 .vis.is-zoomable .vega-embed {
   display: block;
-  transform-origin: top left;
-  transition: transform 160ms ease, margin-bottom 160ms ease;
 }
 
 .vis.is-zoomable .vega-embed > svg {
+  display: block;
   max-width: none;
 }
 
@@ -1049,6 +1048,7 @@ const embedOptions = {
 function addMapZoom(container) {
   container.classList.add("is-zoomable");
   let zoom = 1;
+  let baseWidth = 0;
   let baseHeight = 0;
   const controls = document.createElement("div");
   controls.className = "map-zoom-controls";
@@ -1073,13 +1073,17 @@ function addMapZoom(container) {
 
   function setZoom(nextZoom) {
     zoom = Number(nextZoom.toFixed(1));
-    const embed = container.querySelector(".vega-embed");
-    if (!embed) return;
-    if (!baseHeight) {
-      baseHeight = embed.getBoundingClientRect().height;
+    const svg = container.querySelector(".vega-embed > svg");
+    if (!svg) return;
+
+    if (!baseWidth || !baseHeight) {
+      const box = svg.getBoundingClientRect();
+      baseWidth = box.width;
+      baseHeight = box.height;
     }
-    embed.style.transform = `scale(${zoom})`;
-    embed.style.marginBottom = zoom > 1 ? `${baseHeight * (zoom - 1)}px` : "0";
+
+    svg.style.width = `${baseWidth * zoom}px`;
+    svg.style.height = `${baseHeight * zoom}px`;
     container.classList.toggle("is-zoomed", zoom > 1);
   }
 
