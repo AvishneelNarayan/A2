@@ -651,7 +651,7 @@ def write_site():
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260529d">
+  <link rel="stylesheet" href="css/style.css?v=20260529e">
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -745,7 +745,7 @@ def write_site():
       </section>
     </div>
   </footer>
-  <script src="js/main.js?v=20260529d"></script>
+  <script src="js/main.js?v=20260529e"></script>
 </body>
 </html>
 """
@@ -909,16 +909,27 @@ h2 {
 }
 
 .vis.is-zoomed {
-  overflow: auto;
+  overflow: hidden;
 }
 
-.vis.is-zoomable .vega-embed {
-  display: block;
+.map-viewport {
+  width: 100%;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
 }
 
-.vis.is-zoomable .vega-embed > svg {
+.map-viewport.is-panning {
+  cursor: grabbing;
+}
+
+.map-viewport .vega-embed {
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.map-viewport .vega-embed > svg {
   display: block;
-  max-width: none;
 }
 
 .map-zoom-controls {
@@ -1047,16 +1058,32 @@ const embedOptions = {
 
 function addMapZoom(container) {
   container.classList.add("is-zoomable");
-  let zoom = 1;
-  let baseWidth = 0;
-  let baseHeight = 0;
+  const embed = container.querySelector(".vega-embed");
+  if (!embed) return;
+
+  const viewport = document.createElement("div");
+  viewport.className = "map-viewport";
+  embed.parentNode.insertBefore(viewport, embed);
+  viewport.appendChild(embed);
+
+  const state = {
+    scale: 1,
+    x: 0,
+    y: 0,
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0
+  };
+
   const controls = document.createElement("div");
   controls.className = "map-zoom-controls";
 
   const buttons = [
-    ["-", "Zoom out", () => setZoom(Math.max(0.8, zoom - 0.2))],
-    ["1x", "Reset zoom", () => setZoom(1)],
-    ["+", "Zoom in", () => setZoom(Math.min(2, zoom + 0.2))]
+    ["-", "Zoom out", () => zoomAtCenter(0.82)],
+    ["1x", "Reset zoom", resetZoom],
+    ["+", "Zoom in", () => zoomAtCenter(1.22)]
   ];
 
   buttons.forEach(([label, title, handler]) => {
@@ -1071,23 +1098,77 @@ function addMapZoom(container) {
 
   container.prepend(controls);
 
-  function setZoom(nextZoom) {
-    zoom = Number(nextZoom.toFixed(1));
-    const svg = container.querySelector(".vega-embed > svg");
-    if (!svg) return;
-
-    if (!baseWidth || !baseHeight) {
-      const box = svg.getBoundingClientRect();
-      baseWidth = box.width;
-      baseHeight = box.height;
-    }
-
-    svg.style.width = `${baseWidth * zoom}px`;
-    svg.style.height = `${baseHeight * zoom}px`;
-    container.classList.toggle("is-zoomed", zoom > 1);
+  function applyZoom() {
+    embed.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+    container.classList.toggle("is-zoomed", state.scale > 1);
   }
 
-  setZoom(zoom);
+  function zoomAround(clientX, clientY, factor) {
+    const rect = viewport.getBoundingClientRect();
+    const nextScale = Math.min(4, Math.max(1, state.scale * factor));
+    const scaleRatio = nextScale / state.scale;
+    const pointerX = clientX - rect.left;
+    const pointerY = clientY - rect.top;
+
+    state.x = pointerX - (pointerX - state.x) * scaleRatio;
+    state.y = pointerY - (pointerY - state.y) * scaleRatio;
+    state.scale = nextScale;
+
+    if (state.scale === 1) {
+      state.x = 0;
+      state.y = 0;
+    }
+
+    applyZoom();
+  }
+
+  function zoomAtCenter(factor) {
+    const rect = viewport.getBoundingClientRect();
+    zoomAround(rect.left + rect.width / 2, rect.top + rect.height / 2, factor);
+  }
+
+  function resetZoom() {
+    state.scale = 1;
+    state.x = 0;
+    state.y = 0;
+    applyZoom();
+  }
+
+  viewport.addEventListener("wheel", (event) => {
+    event.preventDefault();
+    zoomAround(event.clientX, event.clientY, event.deltaY < 0 ? 1.14 : 0.88);
+  }, { passive: false });
+
+  viewport.addEventListener("pointerdown", (event) => {
+    if (state.scale <= 1) return;
+    state.isDragging = true;
+    state.startX = event.clientX;
+    state.startY = event.clientY;
+    state.originX = state.x;
+    state.originY = state.y;
+    viewport.classList.add("is-panning");
+    viewport.setPointerCapture(event.pointerId);
+  });
+
+  viewport.addEventListener("pointermove", (event) => {
+    if (!state.isDragging) return;
+    state.x = state.originX + event.clientX - state.startX;
+    state.y = state.originY + event.clientY - state.startY;
+    applyZoom();
+  });
+
+  viewport.addEventListener("pointerup", (event) => {
+    state.isDragging = false;
+    viewport.classList.remove("is-panning");
+    viewport.releasePointerCapture(event.pointerId);
+  });
+
+  viewport.addEventListener("pointercancel", () => {
+    state.isDragging = false;
+    viewport.classList.remove("is-panning");
+  });
+
+  applyZoom();
 }
 
 charts.forEach(([target, spec, zoomable]) => {

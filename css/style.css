@@ -158,16 +158,27 @@ h2 {
 }
 
 .vis.is-zoomed {
-  overflow: auto;
+  overflow: hidden;
 }
 
-.vis.is-zoomable .vega-embed {
-  display: block;
+.map-viewport {
+  width: 100%;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
 }
 
-.vis.is-zoomable .vega-embed > svg {
+.map-viewport.is-panning {
+  cursor: grabbing;
+}
+
+.map-viewport .vega-embed {
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.map-viewport .vega-embed > svg {
   display: block;
-  max-width: none;
 }
 
 .map-zoom-controls {
