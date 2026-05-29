@@ -302,32 +302,6 @@ def build_sa2_outputs(sa2_polys, population, stops, counts):
     ]
     write_csv(PROCESSED / "top_bottom_access.csv", ranked, fields + ["rank_group"])
 
-    component_rows = []
-    components = [
-        ("Stops per resident", "per_capita_component"),
-        ("Stop density", "density_component"),
-        ("Mode diversity", "diversity_component"),
-        ("Train bonus", "rail_component"),
-        ("Tram bonus", "tram_component"),
-    ]
-    for group, subset in [("Highest access", top[:5]), ("Lowest access", bottom[:5])]:
-        for r in subset:
-            for label, field in components:
-                component_rows.append(
-                    {
-                        "SA2_NAME21": r["SA2_NAME21"],
-                        "rank_group": group,
-                        "component": label,
-                        "contribution": r[field],
-                        "access_score": r["access_score"],
-                    }
-                )
-    write_csv(
-        PROCESSED / "score_components.csv",
-        component_rows,
-        ["SA2_NAME21", "rank_group", "component", "contribution", "access_score"],
-    )
-
     features = []
     row_by_code = {r["SA2_CODE21"]: r for r in rows}
     for poly in sa2_polys:
@@ -697,31 +671,6 @@ def write_specs():
         },
     }
 
-    specs["15_access_score_components.json"] = {
-        **spec_base("What Drives the Final Access Score?"),
-        "width": "container",
-        "height": 460,
-        "data": {"url": "data/processed/score_components.csv"},
-        "transform": [
-            {"calculate": "datum.rank_group == 'Highest access' ? 'Strongest: ' + datum.SA2_NAME21 : 'Weakest: ' + datum.SA2_NAME21", "as": "ranked_sa2"}
-        ],
-        "mark": {"type": "bar"},
-        "encoding": {
-            "x": {"field": "contribution", "type": "quantitative", "title": "Score contribution", "stack": "zero"},
-            "y": {"field": "ranked_sa2", "type": "nominal", "sort": {"field": "access_score", "order": "descending"}, "title": None},
-            "color": {
-                "field": "component",
-                "type": "nominal",
-                "scale": {
-                    "domain": ["Stops per resident", "Stop density", "Mode diversity", "Train bonus", "Tram bonus"],
-                    "range": ["#2b8cbe", "#7bccc4", "#bae4bc", "#fdb863", "#e66101"],
-                },
-                "title": "Score component",
-            },
-            "tooltip": [{"field": "SA2_NAME21"}, {"field": "rank_group"}, {"field": "component"}, {"field": "contribution"}, {"field": "access_score"}],
-        },
-    }
-
     specs["10_ranked_access_bar.json"] = {
         **spec_base("The Highest and Lowest Access Scores"),
         "width": "container",
@@ -780,7 +729,7 @@ def write_site():
       <div class="hero__stats">
         <div><strong>2025</strong><span>ABS population year</span></div>
         <div><strong>Greater Melbourne</strong><span>SA2 analysis area</span></div>
-        <div><strong>15</strong><span>Vega-Lite views</span></div>
+        <div><strong>14</strong><span>Vega-Lite views</span></div>
       </div>
     </div>
   </header>
@@ -839,8 +788,6 @@ def write_site():
       <p class="section-kicker">5. Final access score</p>
       <h2>A simple score brings the signals together</h2>
       <p>The final score combines stops per resident, stops per square kilometre, mode diversity, and rail/tram availability. It is not an official measure, but it helps compare areas consistently and makes the trade-offs visible.</p>
-      <div id="access_score_components" class="vis" data-note="The strongest SA2s combine density, per-resident supply and fixed-rail bonuses; weaker SA2s miss several ingredients."></div>
-      <p class="chart-note">Breaking the score into components shows why the final ranking differs so much: high-scoring areas tend to accumulate advantages across several measures rather than winning on one measure alone.</p>
       <div id="ranked_access_bar" class="vis" data-note="The top and bottom SA2s show the clearest contrast in overall access."></div>
       <p class="chart-note">The ranked bars identify the clearest extremes, separating areas where multiple access signals stack up from those where the network appears thinner.</p>
       <div id="access_score_choropleth" class="vis large" data-note="Higher access clusters around the inner transport core; weaker scores appear more often near the fringe."></div>
@@ -1139,7 +1086,6 @@ footer a {
   ["#population_access_choropleth", "js/vega/08_population_access_choropleth.json?v=20260529b"],
   ["#underserved_high_population_bar", "js/vega/14_underserved_high_population_bar.json?v=20260529a"],
   ["#population_vs_stops_scatter", "js/vega/09_population_vs_stops_scatter.json?v=20260522c"],
-  ["#access_score_components", "js/vega/15_access_score_components.json?v=20260529a"],
   ["#ranked_access_bar", "js/vega/10_ranked_access_bar.json?v=20260522c"],
   ["#access_score_choropleth", "js/vega/11_access_score_choropleth.json?v=20260522c"],
   ["#hourly_service_heatmap", "js/vega/12_hourly_service_heatmap.json?v=20260522c"]

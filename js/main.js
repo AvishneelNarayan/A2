@@ -10,7 +10,6 @@ const charts = [
   ["#population_access_choropleth", "js/vega/08_population_access_choropleth.json?v=20260529b"],
   ["#underserved_high_population_bar", "js/vega/14_underserved_high_population_bar.json?v=20260529a"],
   ["#population_vs_stops_scatter", "js/vega/09_population_vs_stops_scatter.json?v=20260522c"],
-  ["#access_score_components", "js/vega/15_access_score_components.json?v=20260529a"],
   ["#ranked_access_bar", "js/vega/10_ranked_access_bar.json?v=20260522c"],
   ["#access_score_choropleth", "js/vega/11_access_score_choropleth.json?v=20260522c"],
   ["#hourly_service_heatmap", "js/vega/12_hourly_service_heatmap.json?v=20260522c"]
