@@ -25,51 +25,103 @@
   "data": {
     "url": "data/processed/sa2_access_summary.csv"
   },
-  "mark": {
-    "type": "circle",
-    "opacity": 0.68,
-    "size": 70
-  },
-  "encoding": {
-    "x": {
-      "field": "population",
-      "type": "quantitative",
-      "title": "Population, 2025",
-      "scale": {
-        "type": "sqrt"
+  "layer": [
+    {
+      "mark": {
+        "type": "circle",
+        "opacity": 0.68,
+        "size": 70
+      },
+      "encoding": {
+        "x": {
+          "field": "population",
+          "type": "quantitative",
+          "title": "Population, 2025",
+          "scale": {
+            "type": "sqrt"
+          }
+        },
+        "y": {
+          "field": "total_stops",
+          "type": "quantitative",
+          "title": "Total stops",
+          "scale": {
+            "type": "sqrt"
+          }
+        },
+        "color": {
+          "field": "access_score",
+          "type": "quantitative",
+          "scale": {
+            "scheme": "viridis"
+          },
+          "title": "Access score"
+        },
+        "tooltip": [
+          {
+            "field": "SA2_NAME21",
+            "title": "SA2"
+          },
+          {
+            "field": "population",
+            "format": ","
+          },
+          {
+            "field": "total_stops"
+          },
+          {
+            "field": "access_score"
+          }
+        ]
       }
     },
-    "y": {
-      "field": "total_stops",
-      "type": "quantitative",
-      "title": "Total stops",
-      "scale": {
-        "type": "sqrt"
+    {
+      "data": {
+        "values": [
+          {
+            "population": 36658,
+            "total_stops": 37,
+            "label": "High population, low stop supply"
+          },
+          {
+            "population": 20882,
+            "total_stops": 196,
+            "label": "High stop supply"
+          }
+        ]
+      },
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "middle",
+        "dx": 8,
+        "dy": -8,
+        "font": "Inter, Arial, sans-serif",
+        "fontSize": 12,
+        "fontWeight": "bold",
+        "fill": "#172026",
+        "stroke": "white",
+        "strokeWidth": 3
+      },
+      "encoding": {
+        "x": {
+          "field": "population",
+          "type": "quantitative",
+          "scale": {
+            "type": "sqrt"
+          }
+        },
+        "y": {
+          "field": "total_stops",
+          "type": "quantitative",
+          "scale": {
+            "type": "sqrt"
+          }
+        },
+        "text": {
+          "field": "label"
+        }
       }
-    },
-    "color": {
-      "field": "access_score",
-      "type": "quantitative",
-      "scale": {
-        "scheme": "viridis"
-      },
-      "title": "Access score"
-    },
-    "tooltip": [
-      {
-        "field": "SA2_NAME21",
-        "title": "SA2"
-      },
-      {
-        "field": "population",
-        "format": ","
-      },
-      {
-        "field": "total_stops"
-      },
-      {
-        "field": "access_score"
-      }
-    ]
-  }
+    }
+  ]
 }

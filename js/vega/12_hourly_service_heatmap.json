@@ -25,43 +25,136 @@
   "data": {
     "url": "data/processed/hourly_service.csv"
   },
-  "mark": {
-    "type": "rect"
-  },
-  "encoding": {
-    "x": {
-      "field": "hour",
-      "type": "ordinal",
-      "sort": [
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-        20, 21, 22, 23
-      ],
-      "title": "Hour of day"
-    },
-    "y": {
-      "field": "mode",
-      "type": "nominal",
-      "title": null
-    },
-    "color": {
-      "field": "departures",
-      "type": "quantitative",
-      "scale": {
-        "scheme": "blues"
+  "layer": [
+    {
+      "mark": {
+        "type": "rect"
       },
-      "title": "Departures"
-    },
-    "tooltip": [
-      {
-        "field": "mode"
-      },
-      {
-        "field": "hour"
-      },
-      {
-        "field": "departures",
-        "format": ","
+      "encoding": {
+        "x": {
+          "field": "hour",
+          "type": "ordinal",
+          "sort": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23
+          ],
+          "title": "Hour of day"
+        },
+        "y": {
+          "field": "mode",
+          "type": "nominal",
+          "title": null
+        },
+        "color": {
+          "field": "departures",
+          "type": "quantitative",
+          "scale": {
+            "scheme": "blues"
+          },
+          "title": "Departures"
+        },
+        "tooltip": [
+          {
+            "field": "mode"
+          },
+          {
+            "field": "hour"
+          },
+          {
+            "field": "departures",
+            "format": ","
+          }
+        ]
       }
-    ]
-  }
+    },
+    {
+      "data": {
+        "values": [
+          {
+            "hour": 8,
+            "mode": "Train",
+            "label": "Morning peak"
+          },
+          {
+            "hour": 17,
+            "mode": "Train",
+            "label": "Evening peak"
+          }
+        ]
+      },
+      "mark": {
+        "type": "text",
+        "align": "center",
+        "baseline": "bottom",
+        "dy": -8,
+        "font": "Inter, Arial, sans-serif",
+        "fontSize": 12,
+        "fontWeight": "bold",
+        "fill": "#172026",
+        "stroke": "white",
+        "strokeWidth": 3
+      },
+      "encoding": {
+        "x": {
+          "field": "hour",
+          "type": "ordinal",
+          "sort": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23
+          ]
+        },
+        "y": {
+          "field": "mode",
+          "type": "nominal"
+        },
+        "text": {
+          "field": "label"
+        }
+      }
+    }
+  ]
 }

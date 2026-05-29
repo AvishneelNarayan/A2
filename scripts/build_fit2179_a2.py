@@ -647,9 +647,161 @@ def write_specs():
         },
     }
 
+    add_chart_annotations(specs)
+
     for name, spec in specs.items():
         with (VEGA / name).open("w", encoding="utf-8") as f:
             json.dump(spec, f, indent=2)
+
+
+def add_chart_annotations(specs):
+    density = specs["04_stop_density_choropleth.json"]
+    density["layer"] = [
+        {"mark": density.pop("mark"), "encoding": density.pop("encoding")},
+        {
+            "data": {"values": [{"note": "Density favours compact inner suburbs where many stops fit into small SA2s."}]},
+            "mark": {
+                "type": "text",
+                "align": "left",
+                "baseline": "top",
+                "font": "Inter, Arial, sans-serif",
+                "fontSize": 12,
+                "fontWeight": "bold",
+                "fill": "#172026",
+                "stroke": "white",
+                "strokeWidth": 3,
+            },
+            "encoding": {"x": {"value": 24}, "y": {"value": 420}, "text": {"field": "note"}},
+        },
+    ]
+
+    scatter = specs["09_population_vs_stops_scatter.json"]
+    scatter["layer"] = [
+        {"mark": scatter.pop("mark"), "encoding": scatter.pop("encoding")},
+        {
+            "data": {
+                "values": [
+                    {"population": 36658, "total_stops": 37, "label": "High population, low stop supply"},
+                    {"population": 20882, "total_stops": 196, "label": "High stop supply"},
+                ]
+            },
+            "mark": {
+                "type": "text",
+                "align": "left",
+                "baseline": "middle",
+                "dx": 8,
+                "dy": -8,
+                "font": "Inter, Arial, sans-serif",
+                "fontSize": 12,
+                "fontWeight": "bold",
+                "fill": "#172026",
+                "stroke": "white",
+                "strokeWidth": 3,
+            },
+            "encoding": {
+                "x": {"field": "population", "type": "quantitative", "scale": {"type": "sqrt"}},
+                "y": {"field": "total_stops", "type": "quantitative", "scale": {"type": "sqrt"}},
+                "text": {"field": "label"},
+            },
+        },
+    ]
+
+    ranked = specs["10_ranked_access_bar.json"]
+    ranked_encoding = ranked.pop("encoding")
+    ranked_encoding["opacity"] = {
+        "condition": {
+            "test": "(datum.rank_group == 'Highest access' && datum.access_score >= 97.8) || (datum.rank_group == 'Lowest access' && datum.access_score <= 7.1)",
+            "value": 1,
+        },
+        "value": 0.42,
+    }
+    ranked["layer"] = [
+        {"mark": ranked.pop("mark"), "encoding": ranked_encoding},
+        {
+            "data": {
+                "values": [
+                    {"SA2_NAME21": "East Melbourne", "access_score": 99, "label": "Top 5 strongest"},
+                    {"SA2_NAME21": "Panton Hill - St Andrews", "access_score": 28, "label": "Bottom 5 weakest"},
+                ]
+            },
+            "mark": {
+                "type": "text",
+                "align": "left",
+                "baseline": "middle",
+                "font": "Inter, Arial, sans-serif",
+                "fontSize": 12,
+                "fontWeight": "bold",
+                "fill": "#172026",
+            },
+            "encoding": {
+                "x": {"field": "access_score", "type": "quantitative"},
+                "y": {"field": "SA2_NAME21", "type": "nominal", "sort": "-x"},
+                "text": {"field": "label"},
+            },
+        },
+    ]
+
+    access = specs["11_access_score_choropleth.json"]
+    access["layer"] = [
+        {"mark": access.pop("mark"), "encoding": access.pop("encoding")},
+        {
+            "data": {
+                "values": [
+                    {"longitude": 144.982, "latitude": -37.816, "label": "East Melbourne 98.3"},
+                    {"longitude": 144.899, "latitude": -37.798, "label": "Footscray 98.2"},
+                    {"longitude": 145.252, "latitude": -37.638, "label": "Panton Hill 4.3"},
+                    {"longitude": 144.967, "latitude": -37.590, "label": "Wollert 7.1"},
+                ]
+            },
+            "mark": {
+                "type": "text",
+                "align": "left",
+                "baseline": "middle",
+                "dx": 6,
+                "font": "Inter, Arial, sans-serif",
+                "fontSize": 11,
+                "fontWeight": "bold",
+                "fill": "#172026",
+                "stroke": "white",
+                "strokeWidth": 3,
+            },
+            "encoding": {
+                "longitude": {"field": "longitude", "type": "quantitative"},
+                "latitude": {"field": "latitude", "type": "quantitative"},
+                "text": {"field": "label"},
+            },
+        },
+    ]
+
+    heatmap = specs["12_hourly_service_heatmap.json"]
+    heatmap["layer"] = [
+        {"mark": heatmap.pop("mark"), "encoding": heatmap.pop("encoding")},
+        {
+            "data": {
+                "values": [
+                    {"hour": 8, "mode": "Train", "label": "Morning peak"},
+                    {"hour": 17, "mode": "Train", "label": "Evening peak"},
+                ]
+            },
+            "mark": {
+                "type": "text",
+                "align": "center",
+                "baseline": "bottom",
+                "dy": -8,
+                "font": "Inter, Arial, sans-serif",
+                "fontSize": 12,
+                "fontWeight": "bold",
+                "fill": "#172026",
+                "stroke": "white",
+                "strokeWidth": 3,
+            },
+            "encoding": {
+                "x": {"field": "hour", "type": "ordinal", "sort": list(range(24))},
+                "y": {"field": "mode", "type": "nominal"},
+                "text": {"field": "label"},
+            },
+        },
+    ]
 
 
 def write_site():

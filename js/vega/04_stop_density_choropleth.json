@@ -32,47 +32,88 @@
       "property": "features"
     }
   },
-  "mark": {
-    "type": "geoshape",
-    "stroke": "white",
-    "strokeWidth": 0.35
-  },
-  "encoding": {
-    "color": {
-      "field": "properties.stops_per_sqkm",
-      "type": "quantitative",
-      "scale": {
-        "type": "threshold",
-        "domain": [5, 10, 15, 25, 40],
-        "range": [
-          "#e7f4d5",
-          "#b8e3c4",
-          "#75c9bd",
-          "#33a6b8",
-          "#1874a8",
-          "#08306b"
-        ]
+  "layer": [
+    {
+      "mark": {
+        "type": "geoshape",
+        "stroke": "white",
+        "strokeWidth": 0.35
       },
-      "title": "Stops per Square Kilometre",
-      "legend": {
-        "labelExpr": "datum.value == 5 ? '< 5' : datum.value == 10 ? '5-10' : datum.value == 15 ? '10-15' : datum.value == 25 ? '15-25' : datum.value == 40 ? '25-40' : '40+'"
+      "encoding": {
+        "color": {
+          "field": "properties.stops_per_sqkm",
+          "type": "quantitative",
+          "scale": {
+            "type": "threshold",
+            "domain": [
+              5,
+              10,
+              15,
+              25,
+              40
+            ],
+            "range": [
+              "#e7f4d5",
+              "#b8e3c4",
+              "#75c9bd",
+              "#33a6b8",
+              "#1874a8",
+              "#08306b"
+            ]
+          },
+          "title": "Stops per Square Kilometre",
+          "legend": {
+            "labelExpr": "datum.value == 5 ? '< 5' : datum.value == 10 ? '5-10' : datum.value == 15 ? '10-15' : datum.value == 25 ? '15-25' : datum.value == 40 ? '25-40' : '40+'"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "properties.SA2_NAME21",
+            "title": "SA2"
+          },
+          {
+            "field": "properties.total_stops",
+            "title": "Total stops",
+            "format": ","
+          },
+          {
+            "field": "properties.stops_per_sqkm",
+            "title": "Stops per Square Kilometre",
+            "format": ".2f"
+          }
+        ]
       }
     },
-    "tooltip": [
-      {
-        "field": "properties.SA2_NAME21",
-        "title": "SA2"
+    {
+      "data": {
+        "values": [
+          {
+            "note": "Density favours compact inner suburbs where many stops fit into small SA2s."
+          }
+        ]
       },
-      {
-        "field": "properties.total_stops",
-        "title": "Total stops",
-        "format": ","
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "top",
+        "font": "Inter, Arial, sans-serif",
+        "fontSize": 12,
+        "fontWeight": "bold",
+        "fill": "#172026",
+        "stroke": "white",
+        "strokeWidth": 3
       },
-      {
-        "field": "properties.stops_per_sqkm",
-        "title": "Stops per Square Kilometre",
-        "format": ".2f"
+      "encoding": {
+        "x": {
+          "value": 24
+        },
+        "y": {
+          "value": 420
+        },
+        "text": {
+          "field": "note"
+        }
       }
-    ]
-  }
+    }
+  ]
 }
