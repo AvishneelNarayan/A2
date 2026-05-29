@@ -25,97 +25,54 @@
   "data": {
     "url": "data/processed/top_bottom_access.csv"
   },
-  "layer": [
-    {
-      "mark": {
-        "type": "bar",
-        "cornerRadiusEnd": 3
-      },
-      "encoding": {
-        "x": {
-          "field": "access_score",
-          "type": "quantitative",
-          "title": "Access score"
-        },
-        "y": {
-          "field": "SA2_NAME21",
-          "type": "nominal",
-          "sort": "-x",
-          "title": null
-        },
-        "color": {
-          "field": "rank_group",
-          "type": "nominal",
-          "scale": {
-            "domain": [
-              "Highest access",
-              "Lowest access"
-            ],
-            "range": [
-              "#2a9d8f",
-              "#d95f4f"
-            ]
-          },
-          "title": null
-        },
-        "tooltip": [
-          {
-            "field": "SA2_NAME21"
-          },
-          {
-            "field": "rank_group"
-          },
-          {
-            "field": "access_score"
-          }
-        ],
-        "opacity": {
-          "condition": {
-            "test": "(datum.rank_group == 'Highest access' && datum.access_score >= 97.8) || (datum.rank_group == 'Lowest access' && datum.access_score <= 7.1)",
-            "value": 1
-          },
-          "value": 0.42
-        }
-      }
+  "mark": {
+    "type": "bar",
+    "cornerRadiusEnd": 3
+  },
+  "encoding": {
+    "x": {
+      "field": "access_score",
+      "type": "quantitative",
+      "title": "Access score"
     },
-    {
-      "data": {
-        "values": [
-          {
-            "SA2_NAME21": "East Melbourne",
-            "access_score": 99,
-            "label": "Top 5 strongest"
-          },
-          {
-            "SA2_NAME21": "Panton Hill - St Andrews",
-            "access_score": 28,
-            "label": "Bottom 5 weakest"
-          }
+    "y": {
+      "field": "SA2_NAME21",
+      "type": "nominal",
+      "sort": "-x",
+      "title": null
+    },
+    "color": {
+      "field": "rank_group",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "Highest access",
+          "Lowest access"
+        ],
+        "range": [
+          "#2a9d8f",
+          "#d95f4f"
         ]
       },
-      "mark": {
-        "type": "text",
-        "align": "left",
-        "baseline": "middle",
-        "font": "Inter, Arial, sans-serif",
-        "fontSize": 12,
-        "fontWeight": "bold",
-        "fill": "#172026"
+      "title": null
+    },
+    "tooltip": [
+      {
+        "field": "SA2_NAME21"
       },
-      "encoding": {
-        "x": {
-          "field": "access_score",
-          "type": "quantitative"
-        },
-        "y": {
-          "field": "SA2_NAME21",
-          "type": "nominal",
-          "sort": "-x"
-        },
-        "text": {
-          "field": "label"
-        }
+      {
+        "field": "rank_group"
+      },
+      {
+        "field": "access_score"
       }
+    ],
+    "opacity": {
+      "condition": {
+        "test": "(datum.rank_group == 'Highest access' && datum.access_score >= 97.8) || (datum.rank_group == 'Lowest access' && datum.access_score <= 7.1)",
+        "value": 1
+      },
+      "value": 0.42
     }
-  ]
+  }
 }

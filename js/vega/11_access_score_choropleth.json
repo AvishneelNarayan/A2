@@ -32,94 +32,39 @@
       "property": "features"
     }
   },
-  "layer": [
-    {
-      "mark": {
-        "type": "geoshape",
-        "stroke": "white",
-        "strokeWidth": 0.35
-      },
-      "encoding": {
-        "color": {
-          "field": "properties.access_score",
-          "type": "quantitative",
-          "scale": {
-            "scheme": "viridis",
-            "domain": [
-              0,
-              100
-            ]
-          },
-          "title": "Overall Public Transport Access Score"
-        },
-        "tooltip": [
-          {
-            "field": "properties.SA2_NAME21",
-            "title": "SA2"
-          },
-          {
-            "field": "properties.total_stops",
-            "title": "Total stops",
-            "format": ","
-          },
-          {
-            "field": "properties.access_score",
-            "title": "Overall Public Transport Access Score",
-            "format": ".2f"
-          }
+  "mark": {
+    "type": "geoshape",
+    "stroke": "white",
+    "strokeWidth": 0.35
+  },
+  "encoding": {
+    "color": {
+      "field": "properties.access_score",
+      "type": "quantitative",
+      "scale": {
+        "scheme": "viridis",
+        "domain": [
+          0,
+          100
         ]
-      }
+      },
+      "title": "Overall Public Transport Access Score"
     },
-    {
-      "data": {
-        "values": [
-          {
-            "longitude": 144.982,
-            "latitude": -37.816,
-            "label": "East Melbourne 98.3"
-          },
-          {
-            "longitude": 144.899,
-            "latitude": -37.798,
-            "label": "Footscray 98.2"
-          },
-          {
-            "longitude": 145.252,
-            "latitude": -37.638,
-            "label": "Panton Hill 4.3"
-          },
-          {
-            "longitude": 144.967,
-            "latitude": -37.59,
-            "label": "Wollert 7.1"
-          }
-        ]
+    "tooltip": [
+      {
+        "field": "properties.SA2_NAME21",
+        "title": "SA2"
       },
-      "mark": {
-        "type": "text",
-        "align": "left",
-        "baseline": "middle",
-        "dx": 6,
-        "font": "Inter, Arial, sans-serif",
-        "fontSize": 11,
-        "fontWeight": "bold",
-        "fill": "#172026",
-        "stroke": "white",
-        "strokeWidth": 3
+      {
+        "field": "properties.total_stops",
+        "title": "Total stops",
+        "format": ","
       },
-      "encoding": {
-        "longitude": {
-          "field": "longitude",
-          "type": "quantitative"
-        },
-        "latitude": {
-          "field": "latitude",
-          "type": "quantitative"
-        },
-        "text": {
-          "field": "label"
-        }
+      {
+        "field": "properties.access_score",
+        "title": "Overall Public Transport Access Score",
+        "format": ".2f"
       }
-    }
-  ]
+    ]
+  }
 }
