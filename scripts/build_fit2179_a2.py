@@ -687,6 +687,7 @@ def write_site():
       <p class="section-kicker">1. Introduction</p>
       <h2>Start with the shape of the network</h2>
       <p>Train and tram lines create strong corridors, while bus services spread access across far more suburbs. The first two maps show the difference between route structure and stop-level access.</p>
+      <p>Each area in this analysis is an SA2, or Statistical Area Level 2: a small Australian Bureau of Statistics geography designed to represent local communities and suburbs. Using SA2s makes it possible to compare transport access across Greater Melbourne consistently.</p>
       <div id="network_map" class="vis large"></div>
       <p class="chart-note">The network map shows that rail and tram infrastructure is concentrated around strong radial corridors, while many outer areas depend on lighter, more dispersed route coverage.</p>
       <div id="stop_point_map" class="vis large"></div>
