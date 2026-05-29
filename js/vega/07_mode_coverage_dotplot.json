@@ -27,16 +27,8 @@
   },
   "transform": [
     {
-      "fold": [
-        "train_stops",
-        "tram_stops",
-        "bus_stops",
-        "regional_stops"
-      ],
-      "as": [
-        "mode_type",
-        "stops"
-      ]
+      "fold": ["train_stops", "tram_stops", "bus_stops", "regional_stops"],
+      "as": ["mode_type", "stops"]
     },
     {
       "filter": "datum.stops > 0"
@@ -56,9 +48,7 @@
           "as": "sa2_count"
         }
       ],
-      "groupby": [
-        "mode_label"
-      ]
+      "groupby": ["mode_label"]
     }
   ],
   "mark": {
@@ -82,18 +72,8 @@
       "field": "mode_label",
       "type": "nominal",
       "scale": {
-        "domain": [
-          "Train",
-          "Tram",
-          "Bus",
-          "Regional"
-        ],
-        "range": [
-          "#2364aa",
-          "#2a9d8f",
-          "#e76f51",
-          "#7b2cbf"
-        ]
+        "domain": ["Train", "Tram", "Bus", "Regional"],
+        "range": ["#2364aa", "#2a9d8f", "#e76f51", "#7b2cbf"]
       },
       "legend": null
     },

@@ -60,18 +60,8 @@
           "field": "properties.mode",
           "type": "nominal",
           "scale": {
-            "domain": [
-              "Train",
-              "Tram",
-              "Bus",
-              "Regional"
-            ],
-            "range": [
-              "#2364aa",
-              "#2a9d8f",
-              "#e76f51",
-              "#7b2cbf"
-            ]
+            "domain": ["Train", "Tram", "Bus", "Regional"],
+            "range": ["#2364aa", "#2a9d8f", "#e76f51", "#7b2cbf"]
           },
           "title": "Mode"
         },

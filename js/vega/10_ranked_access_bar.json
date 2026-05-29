@@ -45,14 +45,8 @@
       "field": "rank_group",
       "type": "nominal",
       "scale": {
-        "domain": [
-          "Highest access",
-          "Lowest access"
-        ],
-        "range": [
-          "#2a9d8f",
-          "#d95f4f"
-        ]
+        "domain": ["Highest access", "Lowest access"],
+        "range": ["#2a9d8f", "#d95f4f"]
       },
       "title": null
     },

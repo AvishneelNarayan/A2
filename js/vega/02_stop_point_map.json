@@ -30,20 +30,8 @@
       "name": "mode_filter",
       "bind": {
         "input": "select",
-        "options": [
-          null,
-          "Train",
-          "Tram",
-          "Bus",
-          "Regional"
-        ],
-        "labels": [
-          "All modes",
-          "Train",
-          "Tram",
-          "Bus",
-          "Regional"
-        ],
+        "options": [null, "Train", "Tram", "Bus", "Regional"],
+        "labels": ["All modes", "Train", "Tram", "Bus", "Regional"],
         "name": "Mode: "
       }
     }
@@ -91,18 +79,8 @@
           "field": "mode",
           "type": "nominal",
           "scale": {
-            "domain": [
-              "Train",
-              "Tram",
-              "Bus",
-              "Regional"
-            ],
-            "range": [
-              "#2364aa",
-              "#2a9d8f",
-              "#e76f51",
-              "#7b2cbf"
-            ]
+            "domain": ["Train", "Tram", "Bus", "Regional"],
+            "range": ["#2364aa", "#2a9d8f", "#e76f51", "#7b2cbf"]
           }
         },
         "tooltip": [

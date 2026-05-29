@@ -26,12 +26,12 @@
   "facet": {
     "field": "mode",
     "type": "nominal",
-    "columns": 4,
     "title": null
   },
-        "spec": {
-            "width": 240,
-            "height": 320,
+  "columns": 4,
+  "spec": {
+    "width": 240,
+    "height": 320,
     "projection": {
       "type": "mercator"
     },
@@ -70,18 +70,8 @@
             "field": "mode",
             "type": "nominal",
             "scale": {
-              "domain": [
-                "Train",
-                "Tram",
-                "Bus",
-                "Regional"
-              ],
-              "range": [
-                "#2364aa",
-                "#2a9d8f",
-                "#e76f51",
-                "#7b2cbf"
-              ]
+              "domain": ["Train", "Tram", "Bus", "Regional"],
+              "range": ["#2364aa", "#2a9d8f", "#e76f51", "#7b2cbf"]
             },
             "legend": null
           }

@@ -44,16 +44,8 @@
       "filter": "datum.rank <= 15"
     },
     {
-      "fold": [
-        "train_stops",
-        "tram_stops",
-        "bus_stops",
-        "regional_stops"
-      ],
-      "as": [
-        "mode_type",
-        "stops"
-      ]
+      "fold": ["train_stops", "tram_stops", "bus_stops", "regional_stops"],
+      "as": ["mode_type", "stops"]
     },
     {
       "calculate": "replace(replace(replace(replace(datum.mode_type, '_stops', ''), 'train', 'Train'), 'tram', 'Tram'), 'bus', 'Bus')",
@@ -86,18 +78,8 @@
       "field": "mode_label",
       "type": "nominal",
       "scale": {
-        "domain": [
-          "Train",
-          "Tram",
-          "Bus",
-          "Regional"
-        ],
-        "range": [
-          "#2364aa",
-          "#2a9d8f",
-          "#e76f51",
-          "#7b2cbf"
-        ]
+        "domain": ["Train", "Tram", "Bus", "Regional"],
+        "range": ["#2364aa", "#2a9d8f", "#e76f51", "#7b2cbf"]
       },
       "title": "Mode"
     },

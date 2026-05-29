@@ -43,10 +43,7 @@
       "type": "quantitative",
       "scale": {
         "scheme": "viridis",
-        "domain": [
-          0,
-          100
-        ]
+        "domain": [0, 100]
       },
       "title": "Overall Public Transport Access Score"
     },
