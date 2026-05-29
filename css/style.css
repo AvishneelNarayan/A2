@@ -1,10 +1,12 @@
 :root {
-  --ink: #172026;
-  --muted: #5c6970;
-  --line: #dce3e6;
-  --paper: #fbfaf7;
+  --ink: #edf5f1;
+  --body-copy: #c7d5d0;
+  --muted: #9fb1ac;
+  --line: rgba(209, 225, 219, 0.22);
+  --paper: #172522;
   --panel: #ffffff;
-  --accent: #2364aa;
+  --panel-ink: #172026;
+  --accent: #72c9b8;
   --accent-2: #2a9d8f;
 }
 
@@ -117,7 +119,7 @@ h2 {
 
 .story-section p {
   max-width: 780px;
-  color: var(--muted);
+  color: var(--body-copy);
   font-size: 1.02rem;
 }
 
@@ -128,13 +130,14 @@ h2 {
 .vis {
   position: relative;
   width: 100%;
-  margin: 28px 0;
+  margin: 28px 0 12px;
   padding: 22px;
   background: var(--panel);
-  border: 1px solid var(--line);
+  color: var(--panel-ink);
+  border: 1px solid rgba(213, 226, 222, 0.72);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 10px 28px rgba(24, 39, 46, 0.06);
+  box-shadow: 0 18px 36px rgba(4, 12, 10, 0.28);
 }
 
 .vis.large {
@@ -188,7 +191,7 @@ h2 {
   border: 1px solid transparent;
   border-radius: 6px;
   background: #f5f7f8;
-  color: var(--ink);
+  color: var(--panel-ink);
   font: 700 0.92rem/1 Inter, Arial, sans-serif;
   cursor: pointer;
 }
@@ -197,6 +200,15 @@ h2 {
 .map-zoom-controls button:focus-visible {
   border-color: var(--accent);
   outline: none;
+}
+
+.chart-note {
+  margin: 0 0 34px;
+  padding: 14px 18px;
+  color: var(--body-copy);
+  background: rgba(255, 255, 255, 0.055);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
 }
 
 footer {
