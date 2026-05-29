@@ -21,7 +21,7 @@
     }
   },
   "width": "container",
-  "height": 430,
+  "height": 460,
   "data": {
     "url": "data/processed/score_components.csv"
   },
@@ -30,21 +30,19 @@
   },
   "encoding": {
     "x": {
-      "field": "SA2_NAME21",
+      "field": "contribution",
+      "type": "quantitative",
+      "title": "Score contribution",
+      "stack": "zero"
+    },
+    "y": {
+      "field": "ranked_sa2",
       "type": "nominal",
       "sort": {
         "field": "access_score",
         "order": "descending"
       },
-      "axis": {
-        "labelAngle": -35
-      },
       "title": null
-    },
-    "y": {
-      "field": "contribution",
-      "type": "quantitative",
-      "title": "Score contribution"
     },
     "color": {
       "field": "component",
@@ -67,12 +65,6 @@
       },
       "title": "Score component"
     },
-    "column": {
-      "field": "rank_group",
-      "type": "nominal",
-      "title": null,
-      "spacing": 18
-    },
     "tooltip": [
       {
         "field": "SA2_NAME21"
@@ -90,5 +82,11 @@
         "field": "access_score"
       }
     ]
-  }
+  },
+  "transform": [
+    {
+      "calculate": "datum.rank_group == 'Highest access' ? 'Strongest: ' + datum.SA2_NAME21 : 'Weakest: ' + datum.SA2_NAME21",
+      "as": "ranked_sa2"
+    }
+  ]
 }

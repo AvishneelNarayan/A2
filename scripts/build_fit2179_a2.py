@@ -700,12 +700,15 @@ def write_specs():
     specs["15_access_score_components.json"] = {
         **spec_base("What Drives the Final Access Score?"),
         "width": "container",
-        "height": 430,
+        "height": 460,
         "data": {"url": "data/processed/score_components.csv"},
+        "transform": [
+            {"calculate": "datum.rank_group == 'Highest access' ? 'Strongest: ' + datum.SA2_NAME21 : 'Weakest: ' + datum.SA2_NAME21", "as": "ranked_sa2"}
+        ],
         "mark": {"type": "bar"},
         "encoding": {
-            "x": {"field": "SA2_NAME21", "type": "nominal", "sort": {"field": "access_score", "order": "descending"}, "axis": {"labelAngle": -35}, "title": None},
-            "y": {"field": "contribution", "type": "quantitative", "title": "Score contribution"},
+            "x": {"field": "contribution", "type": "quantitative", "title": "Score contribution", "stack": "zero"},
+            "y": {"field": "ranked_sa2", "type": "nominal", "sort": {"field": "access_score", "order": "descending"}, "title": None},
             "color": {
                 "field": "component",
                 "type": "nominal",
@@ -715,7 +718,6 @@ def write_specs():
                 },
                 "title": "Score component",
             },
-            "column": {"field": "rank_group", "type": "nominal", "title": None, "spacing": 18},
             "tooltip": [{"field": "SA2_NAME21"}, {"field": "rank_group"}, {"field": "component"}, {"field": "contribution"}, {"field": "access_score"}],
         },
     }
