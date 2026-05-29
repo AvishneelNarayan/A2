@@ -1,0 +1,51 @@
+SA2_NAME21,rank_group,component,contribution,access_score
+East Melbourne,Highest access,Stops per resident,39.3,98.3
+East Melbourne,Highest access,Stop density,24.0,98.3
+East Melbourne,Highest access,Mode diversity,9.9,98.3
+East Melbourne,Highest access,Train bonus,15,98.3
+East Melbourne,Highest access,Tram bonus,10,98.3
+Footscray,Highest access,Stops per resident,38.4,98.2
+Footscray,Highest access,Stop density,24.7,98.2
+Footscray,Highest access,Mode diversity,10.0,98.2
+Footscray,Highest access,Train bonus,15,98.2
+Footscray,Highest access,Tram bonus,10,98.2
+Essendon - East,Highest access,Stops per resident,38.3,97.9
+Essendon - East,Highest access,Stop density,24.7,97.9
+Essendon - East,Highest access,Mode diversity,9.9,97.9
+Essendon - East,Highest access,Train bonus,15,97.9
+Essendon - East,Highest access,Tram bonus,10,97.9
+Armadale,Highest access,Stops per resident,38.2,97.9
+Armadale,Highest access,Stop density,24.8,97.9
+Armadale,Highest access,Mode diversity,9.9,97.9
+Armadale,Highest access,Train bonus,15,97.9
+Armadale,Highest access,Tram bonus,10,97.9
+Melbourne CBD - West,Highest access,Stops per resident,37.9,97.8
+Melbourne CBD - West,Highest access,Stop density,25.0,97.8
+Melbourne CBD - West,Highest access,Mode diversity,9.9,97.8
+Melbourne CBD - West,Highest access,Train bonus,15,97.8
+Melbourne CBD - West,Highest access,Tram bonus,10,97.8
+Panton Hill - St Andrews,Lowest access,Stops per resident,0.3,4.3
+Panton Hill - St Andrews,Lowest access,Stop density,0.1,4.3
+Panton Hill - St Andrews,Lowest access,Mode diversity,3.9,4.3
+Panton Hill - St Andrews,Lowest access,Train bonus,0,4.3
+Panton Hill - St Andrews,Lowest access,Tram bonus,0,4.3
+Fraser Rise - Plumpton,Lowest access,Stops per resident,0.4,5.2
+Fraser Rise - Plumpton,Lowest access,Stop density,0.9,5.2
+Fraser Rise - Plumpton,Lowest access,Mode diversity,3.9,5.2
+Fraser Rise - Plumpton,Lowest access,Train bonus,0,5.2
+Fraser Rise - Plumpton,Lowest access,Tram bonus,0,5.2
+Manor Lakes - Quandong,Lowest access,Stops per resident,1.2,6.0
+Manor Lakes - Quandong,Lowest access,Stop density,1.0,6.0
+Manor Lakes - Quandong,Lowest access,Mode diversity,3.9,6.0
+Manor Lakes - Quandong,Lowest access,Train bonus,0,6.0
+Manor Lakes - Quandong,Lowest access,Tram bonus,0,6.0
+Tarneit (West) - Mount Cottrell,Lowest access,Stops per resident,0.9,6.6
+Tarneit (West) - Mount Cottrell,Lowest access,Stop density,1.9,6.6
+Tarneit (West) - Mount Cottrell,Lowest access,Mode diversity,3.9,6.6
+Tarneit (West) - Mount Cottrell,Lowest access,Train bonus,0,6.6
+Tarneit (West) - Mount Cottrell,Lowest access,Tram bonus,0,6.6
+Wollert,Lowest access,Stops per resident,1.0,7.1
+Wollert,Lowest access,Stop density,2.2,7.1
+Wollert,Lowest access,Mode diversity,3.9,7.1
+Wollert,Lowest access,Train bonus,0,7.1
+Wollert,Lowest access,Tram bonus,0,7.1

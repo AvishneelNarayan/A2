@@ -22,7 +22,7 @@
       <div class="hero__stats">
         <div><strong>2025</strong><span>ABS population year</span></div>
         <div><strong>Greater Melbourne</strong><span>SA2 analysis area</span></div>
-        <div><strong>12</strong><span>Vega-Lite views</span></div>
+        <div><strong>15</strong><span>Vega-Lite views</span></div>
       </div>
     </div>
   </header>
@@ -55,6 +55,8 @@
       <p class="section-kicker">3. Mode distribution</p>
       <h2>Having stops is not the same as having choices</h2>
       <p>Some areas have many stops but mostly one mode. Others have fewer stops but benefit from a stronger mode mix, especially where train or tram services sit close to buses.</p>
+      <div id="mode_diversity_choropleth" class="vis large" data-note="Mode diversity highlights where residents have real choice, not just lots of stops."></div>
+      <p class="chart-note">Mapping the number of available modes shows that many suburbs are bus-only, while the strongest choice tends to appear where buses overlap with train or tram access.</p>
       <div id="mode_mix_stacked_bar" class="vis" data-note="High stop totals often still depend heavily on one dominant mode."></div>
       <p class="chart-note">The stacked bars highlight that high stop totals can hide dependence on one mode, especially where bus stops make up most of the local network.</p>
       <div id="mode_coverage_dotplot" class="vis" data-note="More mode options mean more flexible access for residents."></div>
@@ -69,6 +71,8 @@
       <p>Normalising by population changes the picture. A suburb can look well supplied in raw stop counts but less generous once the number of residents is considered.</p>
       <div id="population_access_choropleth" class="vis large" data-note="Per-resident access changes the story by accounting for population pressure."></div>
       <p class="chart-note">When stops are compared against population, some low-population areas stand out strongly, while larger residential areas can look less well supplied per resident.</p>
+      <div id="underserved_high_population_bar" class="vis" data-note="These high-population SA2s have the lowest stop supply per resident."></div>
+      <p class="chart-note">Ranking only high-population SA2s draws attention to places where many residents share a comparatively small stop supply.</p>
       <div id="population_vs_stops_scatter" class="vis" data-note="Some high-population SA2s sit below the main pattern, showing weaker stop supply."></div>
       <p class="chart-note">The scatterplot reinforces the mismatch: population and stop supply increase together only loosely, so high demand does not always align neatly with high stop provision.</p>
     </section>
@@ -77,6 +81,8 @@
       <p class="section-kicker">5. Final access score</p>
       <h2>A simple score brings the signals together</h2>
       <p>The final score combines stops per resident, stops per square kilometre, mode diversity, and rail/tram availability. It is not an official measure, but it helps compare areas consistently and makes the trade-offs visible.</p>
+      <div id="access_score_components" class="vis" data-note="The strongest SA2s combine density, per-resident supply and fixed-rail bonuses; weaker SA2s miss several ingredients."></div>
+      <p class="chart-note">Breaking the score into components shows why the final ranking differs so much: high-scoring areas tend to accumulate advantages across several measures rather than winning on one measure alone.</p>
       <div id="ranked_access_bar" class="vis" data-note="The top and bottom SA2s show the clearest contrast in overall access."></div>
       <p class="chart-note">The ranked bars identify the clearest extremes, separating areas where multiple access signals stack up from those where the network appears thinner.</p>
       <div id="access_score_choropleth" class="vis large" data-note="Higher access clusters around the inner transport core; weaker scores appear more often near the fringe."></div>

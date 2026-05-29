@@ -35,6 +35,7 @@ def main():
         "top_bottom_access.csv",
         "route_summary.csv",
         "hourly_service.csv",
+        "score_components.csv",
     ]:
         rows = list(csv.DictReader((ROOT / "data" / "processed" / csvfile).open(encoding="utf-8")))
         print(f"{csvfile}: {len(rows)} rows")

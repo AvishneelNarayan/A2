@@ -1,0 +1,76 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Mode Diversity Across SA2s",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 500,
+  "projection": {
+    "type": "mercator"
+  },
+  "data": {
+    "url": "data/processed/melbourne_sa2.geojson",
+    "format": {
+      "type": "json",
+      "property": "features"
+    }
+  },
+  "mark": {
+    "type": "geoshape",
+    "stroke": "white",
+    "strokeWidth": 0.35
+  },
+  "encoding": {
+    "color": {
+      "field": "properties.mode_diversity",
+      "type": "ordinal",
+      "scale": {
+        "domain": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "range": [
+          "#f1eef6",
+          "#bdc9e1",
+          "#74a9cf",
+          "#0570b0"
+        ]
+      },
+      "title": "Modes available"
+    },
+    "tooltip": [
+      {
+        "field": "properties.SA2_NAME21",
+        "title": "SA2"
+      },
+      {
+        "field": "properties.mode_diversity",
+        "title": "Modes available"
+      },
+      {
+        "field": "properties.total_stops",
+        "title": "Total stops",
+        "format": ","
+      }
+    ]
+  }
+}

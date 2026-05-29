@@ -1,0 +1,94 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "What Drives the Final Access Score?",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 430,
+  "data": {
+    "url": "data/processed/score_components.csv"
+  },
+  "mark": {
+    "type": "bar"
+  },
+  "encoding": {
+    "x": {
+      "field": "SA2_NAME21",
+      "type": "nominal",
+      "sort": {
+        "field": "access_score",
+        "order": "descending"
+      },
+      "axis": {
+        "labelAngle": -35
+      },
+      "title": null
+    },
+    "y": {
+      "field": "contribution",
+      "type": "quantitative",
+      "title": "Score contribution"
+    },
+    "color": {
+      "field": "component",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "Stops per resident",
+          "Stop density",
+          "Mode diversity",
+          "Train bonus",
+          "Tram bonus"
+        ],
+        "range": [
+          "#2b8cbe",
+          "#7bccc4",
+          "#bae4bc",
+          "#fdb863",
+          "#e66101"
+        ]
+      },
+      "title": "Score component"
+    },
+    "column": {
+      "field": "rank_group",
+      "type": "nominal",
+      "title": null,
+      "spacing": 18
+    },
+    "tooltip": [
+      {
+        "field": "SA2_NAME21"
+      },
+      {
+        "field": "rank_group"
+      },
+      {
+        "field": "component"
+      },
+      {
+        "field": "contribution"
+      },
+      {
+        "field": "access_score"
+      }
+    ]
+  }
+}

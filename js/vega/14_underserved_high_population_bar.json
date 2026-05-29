@@ -1,0 +1,96 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "High-Population SA2s With Lower Stop Supply",
+    "anchor": "start",
+    "fontSize": 18,
+    "font": "Inter, Arial, sans-serif"
+  },
+  "background": "transparent",
+  "config": {
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    },
+    "legend": {
+      "labelFont": "Inter, Arial, sans-serif",
+      "titleFont": "Inter, Arial, sans-serif"
+    }
+  },
+  "width": "container",
+  "height": 380,
+  "data": {
+    "url": "data/processed/sa2_access_summary.csv"
+  },
+  "transform": [
+    {
+      "filter": "datum.population >= 30000"
+    },
+    {
+      "window": [
+        {
+          "op": "rank",
+          "as": "rank"
+        }
+      ],
+      "sort": [
+        {
+          "field": "stops_per_10000_residents",
+          "order": "ascending"
+        }
+      ]
+    },
+    {
+      "filter": "datum.rank <= 10"
+    }
+  ],
+  "mark": {
+    "type": "bar",
+    "cornerRadiusEnd": 3
+  },
+  "encoding": {
+    "x": {
+      "field": "stops_per_10000_residents",
+      "type": "quantitative",
+      "title": "Stops per 10,000 residents"
+    },
+    "y": {
+      "field": "SA2_NAME21",
+      "type": "nominal",
+      "sort": "x",
+      "title": null
+    },
+    "color": {
+      "field": "access_score",
+      "type": "quantitative",
+      "scale": {
+        "scheme": "reds",
+        "reverse": true
+      },
+      "title": "Access score"
+    },
+    "tooltip": [
+      {
+        "field": "SA2_NAME21",
+        "title": "SA2"
+      },
+      {
+        "field": "population",
+        "format": ","
+      },
+      {
+        "field": "total_stops"
+      },
+      {
+        "field": "stops_per_10000_residents",
+        "format": ".2f"
+      },
+      {
+        "field": "access_score"
+      }
+    ]
+  }
+}

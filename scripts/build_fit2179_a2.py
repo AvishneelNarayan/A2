@@ -263,10 +263,15 @@ def build_sa2_outputs(sa2_polys, population, stops, counts):
     for r in rows:
         rail_bonus = 15 if r["train_stops"] > 0 else 0
         tram_bonus = 10 if r["tram_stops"] > 0 else 0
+        r["per_capita_component"] = round(percentile(per_capita, r["stops_per_10000_residents"]) * 40, 1)
+        r["density_component"] = round(percentile(density, r["stops_per_sqkm"]) * 25, 1)
+        r["diversity_component"] = round(percentile(diversity, r["mode_diversity"]) * 10, 1)
+        r["rail_component"] = rail_bonus
+        r["tram_component"] = tram_bonus
         score = (
-            percentile(per_capita, r["stops_per_10000_residents"]) * 40
-            + percentile(density, r["stops_per_sqkm"]) * 25
-            + percentile(diversity, r["mode_diversity"]) * 10
+            r["per_capita_component"]
+            + r["density_component"]
+            + r["diversity_component"]
             + rail_bonus
             + tram_bonus
         )
@@ -296,6 +301,32 @@ def build_sa2_outputs(sa2_polys, population, stops, counts):
         {**r, "rank_group": "Lowest access"} for r in bottom
     ]
     write_csv(PROCESSED / "top_bottom_access.csv", ranked, fields + ["rank_group"])
+
+    component_rows = []
+    components = [
+        ("Stops per resident", "per_capita_component"),
+        ("Stop density", "density_component"),
+        ("Mode diversity", "diversity_component"),
+        ("Train bonus", "rail_component"),
+        ("Tram bonus", "tram_component"),
+    ]
+    for group, subset in [("Highest access", top[:5]), ("Lowest access", bottom[:5])]:
+        for r in subset:
+            for label, field in components:
+                component_rows.append(
+                    {
+                        "SA2_NAME21": r["SA2_NAME21"],
+                        "rank_group": group,
+                        "component": label,
+                        "contribution": r[field],
+                        "access_score": r["access_score"],
+                    }
+                )
+    write_csv(
+        PROCESSED / "score_components.csv",
+        component_rows,
+        ["SA2_NAME21", "rank_group", "component", "contribution", "access_score"],
+    )
 
     features = []
     row_by_code = {r["SA2_CODE21"]: r for r in rows}
@@ -605,6 +636,28 @@ def write_specs():
         },
     }
 
+    specs["13_mode_diversity_choropleth.json"] = {
+        **spec_base("Mode Diversity Across SA2s"),
+        "width": "container",
+        "height": 500,
+        "projection": {"type": "mercator"},
+        "data": {"url": "data/processed/melbourne_sa2.geojson", "format": {"type": "json", "property": "features"}},
+        "mark": {"type": "geoshape", "stroke": "white", "strokeWidth": 0.35},
+        "encoding": {
+            "color": {
+                "field": "properties.mode_diversity",
+                "type": "ordinal",
+                "scale": {"domain": [1, 2, 3, 4], "range": ["#f1eef6", "#bdc9e1", "#74a9cf", "#0570b0"]},
+                "title": "Modes available",
+            },
+            "tooltip": [
+                {"field": "properties.SA2_NAME21", "title": "SA2"},
+                {"field": "properties.mode_diversity", "title": "Modes available"},
+                {"field": "properties.total_stops", "title": "Total stops", "format": ","},
+            ],
+        },
+    }
+
     specs["09_population_vs_stops_scatter.json"] = {
         **spec_base("Population and Stop Supply Do Not Always Move Together"),
         "width": "container",
@@ -616,6 +669,54 @@ def write_specs():
             "y": {"field": "total_stops", "type": "quantitative", "title": "Total stops", "scale": {"type": "sqrt"}},
             "color": {"field": "access_score", "type": "quantitative", "scale": {"scheme": "viridis"}, "title": "Access score"},
             "tooltip": [{"field": "SA2_NAME21", "title": "SA2"}, {"field": "population", "format": ","}, {"field": "total_stops"}, {"field": "access_score"}],
+        },
+    }
+
+    specs["14_underserved_high_population_bar.json"] = {
+        **spec_base("High-Population SA2s With Lower Stop Supply"),
+        "width": "container",
+        "height": 380,
+        "data": {"url": "data/processed/sa2_access_summary.csv"},
+        "transform": [
+            {"filter": "datum.population >= 30000"},
+            {"window": [{"op": "rank", "as": "rank"}], "sort": [{"field": "stops_per_10000_residents", "order": "ascending"}]},
+            {"filter": "datum.rank <= 10"},
+        ],
+        "mark": {"type": "bar", "cornerRadiusEnd": 3},
+        "encoding": {
+            "x": {"field": "stops_per_10000_residents", "type": "quantitative", "title": "Stops per 10,000 residents"},
+            "y": {"field": "SA2_NAME21", "type": "nominal", "sort": "x", "title": None},
+            "color": {"field": "access_score", "type": "quantitative", "scale": {"scheme": "reds", "reverse": True}, "title": "Access score"},
+            "tooltip": [
+                {"field": "SA2_NAME21", "title": "SA2"},
+                {"field": "population", "format": ","},
+                {"field": "total_stops"},
+                {"field": "stops_per_10000_residents", "format": ".2f"},
+                {"field": "access_score"},
+            ],
+        },
+    }
+
+    specs["15_access_score_components.json"] = {
+        **spec_base("What Drives the Final Access Score?"),
+        "width": "container",
+        "height": 430,
+        "data": {"url": "data/processed/score_components.csv"},
+        "mark": {"type": "bar"},
+        "encoding": {
+            "x": {"field": "SA2_NAME21", "type": "nominal", "sort": {"field": "access_score", "order": "descending"}, "axis": {"labelAngle": -35}, "title": None},
+            "y": {"field": "contribution", "type": "quantitative", "title": "Score contribution"},
+            "color": {
+                "field": "component",
+                "type": "nominal",
+                "scale": {
+                    "domain": ["Stops per resident", "Stop density", "Mode diversity", "Train bonus", "Tram bonus"],
+                    "range": ["#2b8cbe", "#7bccc4", "#bae4bc", "#fdb863", "#e66101"],
+                },
+                "title": "Score component",
+            },
+            "column": {"field": "rank_group", "type": "nominal", "title": None, "spacing": 18},
+            "tooltip": [{"field": "SA2_NAME21"}, {"field": "rank_group"}, {"field": "component"}, {"field": "contribution"}, {"field": "access_score"}],
         },
     }
 
@@ -829,7 +930,7 @@ def write_site():
       <div class="hero__stats">
         <div><strong>2025</strong><span>ABS population year</span></div>
         <div><strong>Greater Melbourne</strong><span>SA2 analysis area</span></div>
-        <div><strong>12</strong><span>Vega-Lite views</span></div>
+        <div><strong>15</strong><span>Vega-Lite views</span></div>
       </div>
     </div>
   </header>
@@ -862,6 +963,8 @@ def write_site():
       <p class="section-kicker">3. Mode distribution</p>
       <h2>Having stops is not the same as having choices</h2>
       <p>Some areas have many stops but mostly one mode. Others have fewer stops but benefit from a stronger mode mix, especially where train or tram services sit close to buses.</p>
+      <div id="mode_diversity_choropleth" class="vis large" data-note="Mode diversity highlights where residents have real choice, not just lots of stops."></div>
+      <p class="chart-note">Mapping the number of available modes shows that many suburbs are bus-only, while the strongest choice tends to appear where buses overlap with train or tram access.</p>
       <div id="mode_mix_stacked_bar" class="vis" data-note="High stop totals often still depend heavily on one dominant mode."></div>
       <p class="chart-note">The stacked bars highlight that high stop totals can hide dependence on one mode, especially where bus stops make up most of the local network.</p>
       <div id="mode_coverage_dotplot" class="vis" data-note="More mode options mean more flexible access for residents."></div>
@@ -876,6 +979,8 @@ def write_site():
       <p>Normalising by population changes the picture. A suburb can look well supplied in raw stop counts but less generous once the number of residents is considered.</p>
       <div id="population_access_choropleth" class="vis large" data-note="Per-resident access changes the story by accounting for population pressure."></div>
       <p class="chart-note">When stops are compared against population, some low-population areas stand out strongly, while larger residential areas can look less well supplied per resident.</p>
+      <div id="underserved_high_population_bar" class="vis" data-note="These high-population SA2s have the lowest stop supply per resident."></div>
+      <p class="chart-note">Ranking only high-population SA2s draws attention to places where many residents share a comparatively small stop supply.</p>
       <div id="population_vs_stops_scatter" class="vis" data-note="Some high-population SA2s sit below the main pattern, showing weaker stop supply."></div>
       <p class="chart-note">The scatterplot reinforces the mismatch: population and stop supply increase together only loosely, so high demand does not always align neatly with high stop provision.</p>
     </section>
@@ -884,6 +989,8 @@ def write_site():
       <p class="section-kicker">5. Final access score</p>
       <h2>A simple score brings the signals together</h2>
       <p>The final score combines stops per resident, stops per square kilometre, mode diversity, and rail/tram availability. It is not an official measure, but it helps compare areas consistently and makes the trade-offs visible.</p>
+      <div id="access_score_components" class="vis" data-note="The strongest SA2s combine density, per-resident supply and fixed-rail bonuses; weaker SA2s miss several ingredients."></div>
+      <p class="chart-note">Breaking the score into components shows why the final ranking differs so much: high-scoring areas tend to accumulate advantages across several measures rather than winning on one measure alone.</p>
       <div id="ranked_access_bar" class="vis" data-note="The top and bottom SA2s show the clearest contrast in overall access."></div>
       <p class="chart-note">The ranked bars identify the clearest extremes, separating areas where multiple access signals stack up from those where the network appears thinner.</p>
       <div id="access_score_choropleth" class="vis large" data-note="Higher access clusters around the inner transport core; weaker scores appear more often near the fringe."></div>
@@ -1176,10 +1283,13 @@ footer a {
   ["#mode_counts_bar", "js/vega/03_mode_counts_bar.json?v=20260522c"],
   ["#stop_density_choropleth", "js/vega/04_stop_density_choropleth.json?v=20260529b"],
   ["#mode_small_multiples", "js/vega/05_mode_small_multiples.json?v=20260529b"],
+  ["#mode_diversity_choropleth", "js/vega/13_mode_diversity_choropleth.json?v=20260529a"],
   ["#mode_mix_stacked_bar", "js/vega/06_mode_mix_stacked_bar.json?v=20260522c"],
   ["#mode_coverage_dotplot", "js/vega/07_mode_coverage_dotplot.json?v=20260522c"],
   ["#population_access_choropleth", "js/vega/08_population_access_choropleth.json?v=20260529b"],
+  ["#underserved_high_population_bar", "js/vega/14_underserved_high_population_bar.json?v=20260529a"],
   ["#population_vs_stops_scatter", "js/vega/09_population_vs_stops_scatter.json?v=20260522c"],
+  ["#access_score_components", "js/vega/15_access_score_components.json?v=20260529a"],
   ["#ranked_access_bar", "js/vega/10_ranked_access_bar.json?v=20260522c"],
   ["#access_score_choropleth", "js/vega/11_access_score_choropleth.json?v=20260522c"],
   ["#hourly_service_heatmap", "js/vega/12_hourly_service_heatmap.json?v=20260522c"]
