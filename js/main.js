@@ -21,6 +21,7 @@ const embedOptions = {
 function addMapZoom(container) {
   container.classList.add("is-zoomable");
   let zoom = 1;
+  let baseHeight = 0;
   const controls = document.createElement("div");
   controls.className = "map-zoom-controls";
 
@@ -46,7 +47,11 @@ function addMapZoom(container) {
     zoom = Number(nextZoom.toFixed(1));
     const embed = container.querySelector(".vega-embed");
     if (!embed) return;
-    embed.style.width = `${zoom * 100}%`;
+    if (!baseHeight) {
+      baseHeight = embed.getBoundingClientRect().height;
+    }
+    embed.style.transform = `scale(${zoom})`;
+    embed.style.marginBottom = zoom > 1 ? `${baseHeight * (zoom - 1)}px` : "0";
     container.classList.toggle("is-zoomed", zoom > 1);
   }
 

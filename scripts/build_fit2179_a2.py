@@ -745,7 +745,7 @@ def write_site():
       </section>
     </div>
   </footer>
-  <script src="js/main.js"></script>
+  <script src="js/main.js?v=20260529c"></script>
 </body>
 </html>
 """
@@ -913,11 +913,12 @@ h2 {
 }
 
 .vis.is-zoomable .vega-embed {
-  transition: width 160ms ease;
+  display: block;
+  transform-origin: top left;
+  transition: transform 160ms ease, margin-bottom 160ms ease;
 }
 
 .vis.is-zoomable .vega-embed > svg {
-  width: 100%;
   max-width: none;
 }
 
@@ -1048,6 +1049,7 @@ const embedOptions = {
 function addMapZoom(container) {
   container.classList.add("is-zoomable");
   let zoom = 1;
+  let baseHeight = 0;
   const controls = document.createElement("div");
   controls.className = "map-zoom-controls";
 
@@ -1073,7 +1075,11 @@ function addMapZoom(container) {
     zoom = Number(nextZoom.toFixed(1));
     const embed = container.querySelector(".vega-embed");
     if (!embed) return;
-    embed.style.width = `${zoom * 100}%`;
+    if (!baseHeight) {
+      baseHeight = embed.getBoundingClientRect().height;
+    }
+    embed.style.transform = `scale(${zoom})`;
+    embed.style.marginBottom = zoom > 1 ? `${baseHeight * (zoom - 1)}px` : "0";
     container.classList.toggle("is-zoomed", zoom > 1);
   }
 
